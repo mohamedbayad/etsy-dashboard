@@ -10,7 +10,7 @@ use App\Models\Supplier;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 
-class Supplierseeder extends Seeder
+class SupplierSeeder extends Seeder
 {
     /**
      * Run the database seeds.

@@ -36,7 +36,7 @@ class DatabaseSeeder extends Seeder
         // N3ayto 3la l-Seeders b tartib
         $this->call([
             StoreSeeder::class,
-            Supplierseeder::class, // Hada ghayzid users b role 'Supplier'
+            SupplierSeeder::class,
             OrderSeeder::class,
         ]);
 
