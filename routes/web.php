@@ -16,9 +16,7 @@ use App\Http\Controllers\Supplier\SupplierDashboardController;
 use App\Http\Controllers\ProfileController;
 
 // --- Public Routes ---
-Route::get('/', function () {
-    return view('welcome');
-});
+Route::redirect('/', '/login');
 
 // --- General Authenticated Routes ---
 Route::middleware(['auth', 'verified'])->group(function () {

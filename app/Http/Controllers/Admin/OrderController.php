@@ -79,7 +79,7 @@ class OrderController extends Controller
             'size' => 'nullable|string',
             'main_days_allocated' => 'required|integer|min:1',
             'extra_days_allocated' => 'required|integer|min:0',
-            'image_path' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'image_path' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:10000',
         ]);
 
         $data = $request->except('_token', 'image_path');
