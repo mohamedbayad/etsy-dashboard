@@ -18,7 +18,42 @@
                     </p>
                 </div>
 
+                <div class="p-6">
+                    <form action="{{ route('supplier.dashboard') }}" method="GET" class="mb-6 pb-6 border-b border-border">
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
+
+                            <div class="space-y-2">
+                                <label for="sort" class="text-sm font-medium leading-none">
+                                    Sort by Date
+                                </label>
+                                <select id="sort" name="sort"
+                                    class="flex h-10 w-full items-center justify-between rounded-md border border-input bg-transparent px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2">
+
+                                    <option value="desc" {{ request('sort', 'desc') == 'desc' ? 'selected' : '' }}>
+                                        Last Order (Newest First)
+                                    </option>
+                                    <option value="asc" {{ request('sort') == 'asc' ? 'selected' : '' }}>
+                                        First Order (Oldest First)
+                                    </option>
+                                </select>
+                            </div>
+
+                            <div class="flex space-x-2">
+                                <button type="submit"
+                                    class="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2">
+                                    Filter
+                                </button>
+                                <a href="{{ route('admin.dashboard') }}"
+                                    class="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors border border-input bg-background hover:bg-accent h-10 px-4 py-2">
+                                    Clear
+                                </a>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+
                 <div class="p-6 pt-0">
+
                     <div class="relative w-full overflow-auto">
                         <table class="w-full caption-bottom text-sm">
                             <thead class="[&_tr]:border-b">
@@ -36,14 +71,14 @@
 
                                     <td class="p-4 align-middle">
                                         @if($order->image_path)
-                                            <img src="{{ asset('storage/' . $order->image_path) }}"
-                                                alt="Order Image"
-                                                class="h-12 w-12 rounded-md object-cover cursor-zoom-in hover:opacity-80 transition-opacity"
-                                                @click="showModal = true; activeImage = '{{ asset('storage/' . $order->image_path) }}'">
+                                        <img src="{{ asset('storage/' . $order->image_path) }}"
+                                            alt="Order Image"
+                                            class="h-12 w-12 rounded-md object-cover cursor-zoom-in hover:opacity-80 transition-opacity"
+                                            @click="showModal = true; activeImage = '{{ asset('storage/' . $order->image_path) }}'">
                                         @else
-                                            <div class="h-12 w-12 rounded-md bg-muted flex items-center justify-center text-xs text-muted-foreground">
-                                                No Img
-                                            </div>
+                                        <div class="h-12 w-12 rounded-md bg-muted flex items-center justify-center text-xs text-muted-foreground">
+                                            No Img
+                                        </div>
                                         @endif
                                     </td>
 

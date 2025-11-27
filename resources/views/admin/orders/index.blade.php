@@ -37,6 +37,18 @@
                             </div>
 
                             <div class="space-y-2">
+                                <label for="store_id" class="text-sm font-medium leading-none">Filter by Store</label>
+                                <select id="store_id" name="store_id" class="flex h-10 w-full items-center justify-between rounded-md border border-input bg-transparent px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2">
+                                    <option value="">All Stores</option>
+                                    @foreach ($stores as $store)
+                                    <option value="{{ $store->id }}" {{ request('store_id') == $store->id ? 'selected' : '' }}>
+                                        {{ $store->name }}
+                                    </option>
+                                    @endforeach
+                                </select>
+                            </div>
+
+                            <div class="space-y-2">
                                 <label for="sort" class="text-sm font-medium leading-none">
                                     Sort by Date
                                 </label>

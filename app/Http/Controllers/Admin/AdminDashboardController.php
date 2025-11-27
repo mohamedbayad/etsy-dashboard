@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Order;
 use App\Models\Supplier;
+use App\Models\Store;
 use Illuminate\Http\Request;
 
 class AdminDashboardController extends Controller
@@ -17,7 +18,7 @@ class AdminDashboardController extends Controller
         $totalSuppliers = Supplier::count();
 
         // last 10 orders
-        $recentOrders = Order::with(['store', 'supplier']) 
+        $recentOrders = Order::with(['store', 'supplier'])
                             ->orderBy('created_at', 'desc')
                             ->take(10)
                             ->get();
@@ -28,6 +29,10 @@ class AdminDashboardController extends Controller
             $query->where('supplier_id', $request->supplier_id);
         }
 
+        if ($request->filled('store_id')) {
+            $query->where('store_id', $request->store_id);
+        }
+
         if ($request->filled('sort') && in_array($request->sort, ['asc', 'desc'])) {
             $query->orderBy('created_at', $request->sort);
         } else {
@@ -36,6 +41,7 @@ class AdminDashboardController extends Controller
 
         $orders = $query->get();
         $suppliers = Supplier::orderBy('first_name')->get();
+        $stores = Store::orderBy('name')->get();
 
         return view('admin.dashboard', compact(
             'totalOrders',
@@ -43,6 +49,7 @@ class AdminDashboardController extends Controller
             'totalSuppliers',
             'orders',
             'suppliers',
+            'stores'
         ));
     }
 }

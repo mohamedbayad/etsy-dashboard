@@ -30,19 +30,22 @@ class OrderController extends Controller
             $query->where('supplier_id', $request->supplier_id);
         }
 
-        if ($request->filled('sort') && in_array($request->sort, ['asc', 'desc'])) {
+        if ($request->filled('store_id')) {
+            $query->where('store_id', $request->store_id);
+        }
 
+        if ($request->filled('sort') && in_array($request->sort, ['asc', 'desc'])) {
             $query->orderBy('created_at', $request->sort);
         } else {
-
             $query->orderBy('created_at', 'desc');
         }
 
         $orders = $query->get();
 
         $suppliers = Supplier::orderBy('first_name')->get();
+        $stores = Store::orderBy('name')->get();
 
-        return view('admin.orders.index', compact('orders', 'suppliers'));
+        return view('admin.orders.index', compact('orders', 'suppliers', 'stores'));
     }
 
     /**
