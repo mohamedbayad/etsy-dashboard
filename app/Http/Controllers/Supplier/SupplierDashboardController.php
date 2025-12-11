@@ -28,16 +28,13 @@ class SupplierDashboardController extends Controller
         $query = $supplierProfile->orders()
                     ->with(['store', 'supplier']);
 
-        // $orders = $supplierProfile->orders()
-        //                     ->with('store')
-        //                     ->orderBy('created_at', 'desc')
-        //                     ->get();
-
 
         if ($request->filled('sort') && in_array($request->sort, ['asc', 'desc'])) {
             $query->orderBy('created_at', $request->sort);
         } else {
-            $query->orderBy('created_at', 'desc');
+            $query->orderBy('days_spent_extra', 'desc');
+            $query->orderBy('days_spent_main', 'desc');
+            $query->orderBy('order_date', 'asc');
         }
 
         $orders = $query->get();

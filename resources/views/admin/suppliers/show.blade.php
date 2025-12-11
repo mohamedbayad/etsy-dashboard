@@ -85,14 +85,14 @@
 
                                         <td class="p-4 align-middle font-medium">
                                             @if($order->status == 'main_time')
-                                                <div class="text-green-600">
+                                                <div class="text-green-600 dark:text-green-400">
                                                     {{ $order->main_days_allocated - $order->days_spent_main }} Days
                                                 </div>
                                                 <div class="text-xs text-muted-foreground">
                                                     ({{ $order->days_spent_main }}/{{ $order->main_days_allocated }})
                                                 </div>
                                             @elseif($order->status == 'extra_time')
-                                                <div class="text-red-600">Exhausted</div>
+                                                <div class="text-red-600 dark:text-red-400">Exhausted</div>
                                             @else
                                                 <div class="text-muted-foreground">N/A</div>
                                             @endif
@@ -100,7 +100,7 @@
 
                                         <td class="p-4 align-middle font-medium">
                                             @if($order->status == 'extra_time')
-                                                <div class="text-red-600">
+                                                <div class="text-red-600 dark:text-red-400">
                                                     {{ $order->extra_days_allocated - $order->days_spent_extra }} Days
                                                 </div>
                                                 <div class="text-xs text-muted-foreground">

@@ -21,9 +21,9 @@
                                 </label>
                                 <select id="store_id" name="store_id" required
                                         class="flex h-10 w-full items-center justify-between rounded-md border border-input bg-transparent px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2">
-                                    <option value="">Select Store...</option>
+                                    <option class="dark:text-black" value="">Select Store...</option>
                                     @foreach ($stores as $store)
-                                        <option value="{{ $store->id }}">{{ $store->name }}</option>
+                                        <option class="dark:text-black" value="{{ $store->id }}">{{ $store->name }}</option>
                                     @endforeach
                                 </select>
                             </div>
@@ -34,9 +34,9 @@
                                 </label>
                                 <select id="supplier_id" name="supplier_id" required
                                         class="flex h-10 w-full items-center justify-between rounded-md border border-input bg-transparent px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2">
-                                    <option value="">Select Supplier...</option>
+                                    <option class="dark:text-black" value="">Select Supplier...</option>
                                     @foreach ($Suppliers as $Supplier)
-                                        <option value="{{ $Supplier->id }}">{{ $Supplier->first_name }} {{ $Supplier->last_name }}</option>
+                                        <option class="dark:text-black" value="{{ $Supplier->id }}">{{ $Supplier->first_name }} {{ $Supplier->last_name }}</option>
                                     @endforeach
                                 </select>
                             </div>
@@ -73,7 +73,14 @@
                                        class="flex h-10 w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2">
                             </div>
 
-                            <div class="space-y-2 md:col-span-2"> <label for="image_path" class="text-sm font-medium leading-none">
+                            <div class="space-y-2 ">
+                                <label for="order_date" class="text-sm font-medium leading-none">Date de la commande</label>
+                                <input type="date" id="order_date" name="order_date" required
+                                    value="{{ old('order_date', isset($order) ? $order->order_date->format('Y-m-d') : date('Y-m-d')) }}"
+                                    class="flex h-10 w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm focus:ring-2 focus:ring-ring">
+                            </div>
+
+                            <div class="space-y-2"> <label for="image_path" class="text-sm font-medium leading-none">
                                     Product Image
                                 </label>
                                 <input id="image_path" name="image_path" type="file"

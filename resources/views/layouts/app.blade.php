@@ -26,12 +26,12 @@
       x-init="
           document.documentElement.classList.toggle('dark', localStorage.getItem('dark') === 'true');
       ">
-        <div class="min-h-screen bg-gray-100 dark:bg-gray-900">
+        <div class="min-h-screen bg-background">
             @include('layouts.navigation')
 
             <!-- Page Heading -->
             @if (isset($header))
-                <header class="bg-white dark:bg-gray-800 shadow">
+                <header class="bg-card border-b border-border shadow">
                     <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
                         {{ $header }}
                     </div>
@@ -48,16 +48,16 @@
                             x-init="setTimeout(() => show = false, 4000)"
                             x-transition:leave="transition ease-in duration-300"
                             x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0"
-                            class="rounded-md border border-green-500 bg-green-50 p-4 shadow-sm mb-4"
+                            class="rounded-md border border-green-500 dark:border-green-600 bg-green-50 dark:bg-green-900/20 p-4 shadow-sm mb-4"
                             role="alert">
                             <div class="flex">
                                 <div class="flex-shrink-0">
-                                    <svg class="h-5 w-5 text-green-600" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                    <svg class="h-5 w-5 text-green-600 dark:text-green-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
                                         <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
                                     </svg>
                                 </div>
                                 <div class="ml-3">
-                                    <p class="text-sm font-medium text-green-800">
+                                    <p class="text-sm font-medium text-green-800 dark:text-green-200">
                                         {{ session('success') }}
                                     </p>
                                 </div>
@@ -70,16 +70,16 @@
                             x-init="setTimeout(() => show = false, 4000)"
                             x-transition:leave="transition ease-in duration-300"
                             x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0"
-                            class="rounded-md border border-red-500 bg-red-50 p-4 shadow-sm mb-4"
+                            class="rounded-md border border-red-500 dark:border-red-600 bg-red-50 dark:bg-red-900/20 p-4 shadow-sm mb-4"
                             role="alert">
                             <div class="flex">
                                 <div class="flex-shrink-0">
-                                    <svg class="h-5 w-5 text-red-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                    <svg class="h-5 w-5 text-red-600 dark:text-red-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
                                     </svg>
                                 </div>
                                 <div class="ml-3">
-                                    <p class="text-sm font-medium text-red-800">
+                                    <p class="text-sm font-medium text-red-800 dark:text-red-200">
                                         {{ session('error') }}
                                     </p>
                                 </div>
@@ -88,16 +88,16 @@
                     @endif
 
                     @if ($errors->any())
-                        <div class="rounded-md border border-red-500 bg-red-50 p-4 shadow-sm mb-4" role="alert">
+                        <div class="rounded-md border border-red-500 dark:border-red-600 bg-red-50 dark:bg-red-900/20 p-4 shadow-sm mb-4" role="alert">
                             <div class="flex">
                                 <div class="flex-shrink-0">
-                                    <svg class="h-5 w-5 text-red-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                    <svg class="h-5 w-5 text-red-600 dark:text-red-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
                                     </svg>
                                 </div>
                                 <div class="ml-3">
-                                    <h3 class="text-sm font-medium text-red-800">Please fix the following errors:</h3>
-                                    <ul class="mt-2 list-disc list-inside text-sm text-red-700">
+                                    <h3 class="text-sm font-medium text-red-800 dark:text-red-200">Please fix the following errors:</h3>
+                                    <ul class="mt-2 list-disc list-inside text-sm text-red-700 dark:text-red-300">
                                         @foreach ($errors->all() as $error)
                                             <li>{{ $error }}</li>
                                         @endforeach

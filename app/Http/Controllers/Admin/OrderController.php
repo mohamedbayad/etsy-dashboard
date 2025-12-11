@@ -37,7 +37,9 @@ class OrderController extends Controller
         if ($request->filled('sort') && in_array($request->sort, ['asc', 'desc'])) {
             $query->orderBy('created_at', $request->sort);
         } else {
-            $query->orderBy('created_at', 'desc');
+            $query->orderBy('days_spent_extra', 'desc');
+            $query->orderBy('days_spent_main', 'desc');
+            $query->orderBy('order_date', 'asc');
         }
 
         $orders = $query->get();
@@ -145,6 +147,7 @@ class OrderController extends Controller
 
         $request->validate([
             'store_id' => 'required|exists:stores,id',
+            'order_date' => 'required|date',
             'supplier_id' => 'required|exists:suppliers,id',
             'status' => 'required|in:main_time,extra_time,completed',
             'color' => 'nullable|string',

@@ -20,7 +20,6 @@ Route::redirect('/', '/login');
 
 // --- General Authenticated Routes ---
 Route::middleware(['auth', 'verified'])->group(function () {
-    // Redirect l-dashboard l-s7i7 3la 7ssab l-role
     Route::get('/dashboard', function () {
         if (auth()->user()->role == 'admin') {
             return redirect()->route('admin.dashboard');
@@ -36,26 +35,20 @@ Route::middleware(['auth', 'verified'])->group(function () {
 });
 
 
-// --- ADMIN ROUTES (Gher Admin li idkhl hna) ---
 Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
 
-    // Admin Dashboard
     Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
 
-    // CRUDs dyal Admin
-    Route::resource('users', UserController::class); // Tzid/Tms7 users
-    Route::resource('stores', StoreController::class); // Tzid/Tms7 stores
-    Route::resource('suppliers', SupplierController::class); // Tzid/Tms7 Suppliers
-    Route::resource('orders', OrderController::class); // Tzid/Tms7 orders
+    Route::resource('users', UserController::class);
+    Route::resource('stores', StoreController::class);
+    Route::resource('suppliers', SupplierController::class);
+    Route::resource('orders', OrderController::class);
 });
 
 
-// --- Supplier ROUTES (Gher Supplier li idkhl hna) ---
 Route::middleware(['auth', 'role:supplier'])->prefix('supplier')->name('supplier.')->group(function () {
 
-    // Supplier Dashboard
     Route::get('/dashboard', [SupplierDashboardController::class, 'index'])->name('dashboard');
-    // Hna ghadi ichof gher les orders dyalo
 });
 
 

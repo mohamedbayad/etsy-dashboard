@@ -2,12 +2,12 @@
     <x-slot name="header">
         <div class="flex justify-between items-center">
             <h2 class="font-semibold text-xl text-foreground leading-tight">
-                {{ __('Gérer les Suppliers') }}
+                {{ __('Create New Supplier') }}
             </h2>
 
             <a href="{{ route('admin.users.create') }}"
                class="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2">
-                Ajouter Supplier
+                Add Supplier
             </a>
         </div>
     </x-slot>

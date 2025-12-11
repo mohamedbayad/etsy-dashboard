@@ -13,9 +13,13 @@ class Order extends Model
     use HasFactory;
 
     protected $fillable = [
-        'store_id', 'supplier_id', 'image_path', 'color', 'size',
+        'store_id', 'order_date', 'supplier_id', 'image_path', 'color', 'size',
         'status', 'note', 'main_days_allocated', 'extra_days_allocated',
         'days_spent_main', 'days_spent_extra'
+    ];
+
+    protected $casts = [
+        'order_date' => 'date',
     ];
 
     public function store()

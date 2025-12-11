@@ -2,12 +2,12 @@
     <x-slot name="header">
         <div class="flex justify-between items-center">
             <h2 class="font-semibold text-xl text-foreground leading-tight">
-                {{ __('Gérer les Utilisateurs') }}
+                {{ __('Create New User') }}
             </h2>
 
             <a href="{{ route('admin.users.create') }}"
                class="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2">
-                Ajouter Utilisateur
+                Add User
             </a>
         </div>
     </x-slot>

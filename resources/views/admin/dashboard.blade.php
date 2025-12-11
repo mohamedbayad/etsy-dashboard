@@ -50,9 +50,9 @@
                                 </label>
                                 <select id="supplier_id" name="supplier_id"
                                     class="flex h-10 w-full items-center justify-between rounded-md border border-input bg-transparent px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2">
-                                    <option value="">All Suppliers</option>
+                                    <option class="dark:text-black" value="">All Suppliers</option>
                                     @foreach ($suppliers as $supplier)
-                                    <option value="{{ $supplier->id }}" {{ request('supplier_id') == $supplier->id ? 'selected' : '' }}>
+                                    <option class="dark:text-black" value="{{ $supplier->id }}" {{ request('supplier_id') == $supplier->id ? 'selected' : '' }}>
                                         {{ $supplier->first_name }} {{ $supplier->last_name }}
                                     </option>
                                     @endforeach
@@ -62,9 +62,9 @@
                             <div class="space-y-2">
                                 <label for="store_id" class="text-sm font-medium leading-none">Filter by Store</label>
                                 <select id="store_id" name="store_id" class="flex h-10 w-full items-center justify-between rounded-md border border-input bg-transparent px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2">
-                                    <option value="">All Stores</option>
+                                    <option class="dark:text-black" value="">All Stores</option>
                                     @foreach ($stores as $store)
-                                    <option value="{{ $store->id }}" {{ request('store_id') == $store->id ? 'selected' : '' }}>
+                                    <option class="dark:text-black" value="{{ $store->id }}" {{ request('store_id') == $store->id ? 'selected' : '' }}>
                                         {{ $store->name }}
                                     </option>
                                     @endforeach
@@ -78,10 +78,10 @@
                                 <select id="sort" name="sort"
                                     class="flex h-10 w-full items-center justify-between rounded-md border border-input bg-transparent px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2">
 
-                                    <option value="desc" {{ request('sort', 'desc') == 'desc' ? 'selected' : '' }}>
+                                    <option class="dark:text-black" value="desc" {{ request('sort', 'desc') == 'desc' ? 'selected' : '' }}>
                                         Last Order (Newest First)
                                     </option>
-                                    <option value="asc" {{ request('sort') == 'asc' ? 'selected' : '' }}>
+                                    <option class="dark:text-black" value="asc" {{ request('sort') == 'asc' ? 'selected' : '' }}>
                                         First Order (Oldest First)
                                     </option>
                                 </select>
@@ -114,6 +114,8 @@
                                     <th class="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Supplier</th>
                                     <th class="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Main Time</th>
                                     <th class="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Extra Time</th>
+                                    <th class="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Days</th>
+                                    <th class="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Order Date</th>
                                     <th class="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Actions</th>
                                 </tr>
                             </thead>
@@ -173,30 +175,70 @@
 
                                     <td class="p-4 align-middle font-medium">
                                         @if($order->status == 'main_time')
-                                        <div class="text-green-600">
+                                        <div class="text-green-600 dark:text-green-400">
                                             {{ $order->main_days_allocated - $order->days_spent_main }} Days
                                         </div>
                                         <div class="text-xs text-muted-foreground">
                                             ({{ $order->days_spent_main }}/{{ $order->main_days_allocated }})
                                         </div>
                                         @elseif($order->status == 'extra_time')
-                                        <div class="text-red-600">Original time has ended</div>
+                                        <div class="text-red-600 dark:text-red-400">Main time exhausted</div>
                                         @else
                                         <div class="text-muted-foreground">N/A</div>
                                         @endif
                                     </td>
 
                                     <td class="p-4 align-middle font-medium">
+                                        @if ( $order->extra_days_allocated - $order->days_spent_extra >= 0)
+                                            @if($order->status == 'extra_time')
+                                                <div class="text-red-600 dark:text-red-400">
+                                                    {{ $order->extra_days_allocated - $order->days_spent_extra }} Days
+                                                </div>
+                                                <div class="text-xs text-muted-foreground">
+                                                    ({{ $order->days_spent_extra }}/{{ $order->extra_days_allocated }})
+                                                </div>
+                                            @else
+                                                <div class="text-muted-foreground">N/A</div>
+                                            @endif
+                                        @else
+                                            <div class="text-red-600 dark:text-red-400">Extra time exhausted</div>
+                                        @endif
+                                    </td>
+
+                                    <td class="p-4 align-middle font-medium">
                                         @if($order->status == 'extra_time')
-                                        <div class="text-red-600">
-                                            {{ $order->extra_days_allocated - $order->days_spent_extra }} Days
+
+                                        @php
+                                        // N7sbo l-baqi hna
+                                        $daysRemaining = $order->extra_days_allocated - $order->days_spent_extra;
+                                        @endphp
+
+                                        @if($daysRemaining >= 0)
+                                        <div class="text-orange-600">
+                                            {{ $daysRemaining }} Days left
                                         </div>
                                         <div class="text-xs text-muted-foreground">
                                             ({{ $order->days_spent_extra }}/{{ $order->extra_days_allocated }})
                                         </div>
                                         @else
+                                        <div class="text-red-700 font-extrabold flex items-center">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                            </svg>
+                                            {{ $daysRemaining }} Days (Retard)
+                                        </div>
+                                        <div class="text-xs text-red-400">
+                                            Overdue by {{ abs($daysRemaining) }} days
+                                        </div>
+                                        @endif
+
+                                        @else
                                         <div class="text-muted-foreground">N/A</div>
                                         @endif
+                                    </td>
+
+                                    <td class="p-4 align-middle font-medium">
+                                        {{ $order->order_date->format('d/m/Y') }}
                                     </td>
 
                                     <td class="p-4 align-middle">
@@ -220,7 +262,7 @@
                                 @empty
                                 <tr>
                                     <td colspan="8" class="p-4 text-center text-muted-foreground">
-                                        Makayn 7ta order db.
+                                        No Order Now.
                                     </td>
                                 </tr>
                                 @endforelse
@@ -241,12 +283,12 @@
             x-transition:leave="transition ease-in duration-200"
             x-transition:leave-start="opacity-100"
             x-transition:leave-end="opacity-0"
-            class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4 backdrop-blur-sm"
+            class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 dark:bg-black/90 p-4 backdrop-blur-sm"
             @click.self="showModal = false">
             <div class="relative bg-transparent max-w-4xl w-full flex justify-center">
 
                 <button @click="showModal = false"
-                    class="absolute -top-12 right-0 text-white hover:text-gray-300 focus:outline-none">
+                    class="absolute -top-12 right-0 text-white hover:text-gray-300 dark:hover:text-gray-400 focus:outline-none">
                     <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <line x1="18" y1="6" x2="6" y2="18"></line>
                         <line x1="6" y1="6" x2="18" y2="18"></line>
@@ -254,7 +296,7 @@
                 </button>
 
                 <img :src="activeImage"
-                    class="max-h-[85vh] w-auto rounded-lg shadow-2xl border border-gray-700 object-contain">
+                    class="max-h-[85vh] w-auto rounded-lg shadow-2xl border border-border object-contain">
             </div>
         </div>
 

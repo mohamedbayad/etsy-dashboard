@@ -22,39 +22,30 @@ class UpdateOrderTimers extends Command
      */
     public function handle()
     {
-        $this->info('Starting order timer update...');
+        $this->info('Calculating order overdue...');
 
-        $mainTimeOrders = Order::where('status', 'main_time')->get();
+        $orders = Order::where('status', '!=', 'completed')->get();
 
-        foreach ($mainTimeOrders as $order) {
-            if ($order->days_spent_main < $order->main_days_allocated) {
+        foreach ($orders as $order) {
 
-                $order->increment('days_spent_main');
-                $this->info("Order #{$order->id} (Main) incremented.");
+            $daysPassed = now()->diffInDays($order->order_date);
 
-            } else {
+            if ($daysPassed < $order->main_days_allocated) {
+                $order->status = 'main_time';
+                $order->days_spent_main = $daysPassed;
+                $order->days_spent_extra = 0;
+            }
+            else {
                 $order->status = 'extra_time';
-                $order->save();
-                $this->info("Order #{$order->id} moved to extra time.");
+                $order->days_spent_main = $order->main_days_allocated;
+
+                $order->days_spent_extra = $daysPassed - $order->main_days_allocated;
             }
+
+            $order->save();
+            $this->info("Order #{$order->id} updated. Total Days Passed: {$daysPassed}");
         }
 
-        $extraTimeOrders = Order::where('status', 'extra_time')->get();
-
-        foreach ($extraTimeOrders as $order) {
-            if ($order->days_spent_extra < $order->extra_days_allocated) {
-
-                $order->increment('days_spent_extra'); // Zid nhar f l-idafi
-                $this->info("Order #{$order->id} (Extra) incremented.");
-
-            } else {
-                $order->status = 'completed';
-                $order->save();
-                $this->info("Order #{$order->id} completed.");
-            }
-        }
-
-        $this->info('Order timer update complete.');
-        return 0;
+        $this->info('All timers updated.');
     }
 }

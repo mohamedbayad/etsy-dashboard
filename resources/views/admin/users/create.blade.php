@@ -17,8 +17,8 @@
                             <label for="role" class="text-sm font-medium leading-none">Role</label>
                             <select id="role" name="role" x-model="role"
                                     class="flex h-10 w-full items-center justify-between rounded-md border border-input bg-transparent px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2">
-                                <option value="supplier">Supplier</option>
-                                <option value="admin">Admin</option>
+                                <option class="dark:text-black" value="supplier">Supplier</option>
+                                <option class="dark:text-black" value="admin">Admin</option>
                             </select>
                         </div>
 
