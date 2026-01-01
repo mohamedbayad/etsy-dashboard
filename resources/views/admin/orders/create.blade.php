@@ -135,9 +135,35 @@
                                         </div>
 
                                         <div class="space-y-2 md:col-span-2">
-                                            <label for="image_path" class="text-sm font-medium leading-none">Product Image</label>
-                                            <input id="image_path" name="image_path" type="file"
-                                                class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm file:border-0 file:bg-transparent file:text-foreground file:text-sm file:font-medium ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2">
+                                            <label for="image_path" class="text-sm font-medium leading-none">Product Image (Paste Ctrl+V supported)</label>
+
+                                            <div class="relative border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-6 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition ease-in-out duration-150 text-center" id="paste_area">
+
+                                                <input id="image_path" name="image_path" type="file" accept="image/*" class="hidden" onchange="previewImage(this)">
+
+                                                <div id="preview_container" class="hidden flex-col items-center">
+                                                    <img id="preview_img" src="#" alt="Image Preview" class="max-h-64 rounded-lg shadow-md mb-3 border border-gray-200">
+                                                    <button type="button" onclick="removeImage()" class="text-xs text-red-500 hover:text-red-700 underline">Remove Image</button>
+                                                </div>
+
+                                                <div id="placeholder_text" class="cursor-pointer" onclick="document.getElementById('image_path').click()">
+                                                    <svg class="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48" aria-hidden="true">
+                                                        <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                                                    </svg>
+                                                    <div class="flex text-sm text-gray-600 dark:text-gray-400 justify-center mt-2">
+                                                        <span class="relative cursor-pointer bg-transparent rounded-md font-medium text-blue-600 hover:text-blue-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-blue-500">
+                                                            Upload a file
+                                                        </span>
+                                                        <p class="pl-1">or drag and drop</p>
+                                                    </div>
+                                                    <p class="text-xs text-gray-500 dark:text-gray-500 mt-1">
+                                                        PNG, JPG, GIF up to 10MB
+                                                    </p>
+                                                    <p class="text-xs text-blue-500 font-bold mt-2">
+                                                        💡 Tip: Click anywhere and press Ctrl+V to paste image
+                                                    </p>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
