@@ -24,10 +24,10 @@ class CheckRole
         }
 
 
-        if ($user->role == 'admin') {
+        if ($user->role == 'admin' || $user->role == 'super_admin') {
             return redirect()->route('admin.dashboard');
         } else {
-            return redirect()->route('suppliers.dashboard');
+            return redirect()->route('supplier.dashboard');
         }
     }
 }

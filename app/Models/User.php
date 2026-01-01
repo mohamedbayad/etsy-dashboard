@@ -49,4 +49,10 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+
+    // Many to Many relationship with Store
+    public function stores()
+{
+    return $this->belongsToMany(Store::class);
+}
 }

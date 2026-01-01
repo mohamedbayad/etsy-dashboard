@@ -16,7 +16,7 @@
                         {{ __('Dashboard') }}
                     </x-nav-link>
                     @auth
-                        @if(auth()->user()->role == 'admin')
+                        @if(auth()->user()->role == 'admin' || auth()->user()->role == 'super_admin')
                             <div class="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex">
 
                                 <x-nav-link :href="route('admin.orders.index')" :active="request()->routeIs('admin.orders.*')">
@@ -31,9 +31,12 @@
                                     {{ __('Suppliers') }}
                                 </x-nav-link>
 
-                                <x-nav-link :href="route('admin.users.index')" :active="request()->routeIs('admin.users.*')">
-                                    {{ __('Utilisateurs') }}
-                                </x-nav-link>
+
+                                @if(auth()->user()->role === 'super_admin')
+                                    <x-nav-link :href="route('admin.users.index')" :active="request()->routeIs('admin.users.*')">
+                                        {{ __('Users') }}
+                                    </x-nav-link>
+                                @endif
 
                             </div>
                         @endif
@@ -44,16 +47,15 @@
             <!-- Settings Dropdown -->
             <div class="hidden sm:flex sm:items-center sm:ml-6">
             <button @click="toggleTheme" type="button"
-                    class="p-2 rounded-full text-muted-foreground hover:text-foreground hover:bg-muted focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2">
-
-                <svg x-show="!dark" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-5 w-5">
-                    <circle cx="12" cy="12" r="4"></circle><path d="M12 2v2"></path><path d="M12 20v2"></path><path d="m4.93 4.93 1.41 1.41"></path><path d="m18.66 18.66 1.41 1.41"></path><path d="M2 12h2"></path><path d="M20 12h2"></path><path d="m6.34 18.66-1.41 1.41"></path><path d="m19.07 4.93-1.41 1.41"></path>
+                    class="inline-flex items-center gap-2 rounded-full border border-border bg-muted px-3 py-1.5 text-xs font-medium text-foreground transition hover:bg-muted/80 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2">
+                <span x-text="dark ? 'Dark' : 'Light'"></span>
+                <svg x-show="!dark" xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <circle cx="12" cy="12" r="4" />
+                    <path d="M12 2v2m0 16v2m8-10h2M2 12h2m12.24-5.76 1.42-1.42M6.34 17.66 4.93 19.07m12.73 0-1.42-1.41M6.34 6.34 4.93 4.93" />
                 </svg>
-
-                <svg x-show="dark" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-5 w-5">
-                    <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"></path>
+                <svg x-show="dark" xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79Z" />
                 </svg>
-
                 <span class="sr-only">Toggle theme</span>
             </button>
                 <x-dropdown align="right" width="48">
@@ -121,7 +123,7 @@
                     </x-responsive-nav-link>
 
                     <x-responsive-nav-link :href="route('admin.users.index')" :active="request()->routeIs('admin.users.*')">
-                        {{ __('Utilisateurs') }}
+                        {{ __('Users') }}
                     </x-responsive-nav-link>
                 @endif
             @endauth

@@ -15,7 +15,8 @@ class Order extends Model
     protected $fillable = [
         'store_id', 'order_date', 'supplier_id', 'image_path', 'color', 'size',
         'status', 'note', 'main_days_allocated', 'extra_days_allocated',
-        'days_spent_main', 'days_spent_extra'
+        'days_spent_main', 'days_spent_extra','customer_name','email','country','quantity',
+        'price','note',
     ];
 
     protected $casts = [

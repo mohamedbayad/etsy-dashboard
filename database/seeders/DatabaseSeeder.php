@@ -30,7 +30,7 @@ class DatabaseSeeder extends Seeder
             'name' => 'Admin',
             'email' => 'admin@example.com',
             'password' => Hash::make('password'), // L-password howa 'password'
-            'role' => 'admin',
+            'role' => 'super_admin',
         ]);
 
         // N3ayto 3la l-Seeders b tartib

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Models\Supplier;
+use App\Models\Store;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -26,7 +27,13 @@ class UserController extends Controller
      */
     public function create()
     {
-        return view('admin.users.create');
+
+        if (auth()->user()->role !== 'super_admin') {
+            return redirect()->route('admin.users.index')->with('error', 'You are not authorized to create users.');
+        }
+
+        $stores = Store::orderBy('name')->get();
+        return view('admin.users.create', compact('stores'));
     }
 
     /**
@@ -34,8 +41,9 @@ class UserController extends Controller
      */
     public function store(Request $request)
     {
+
         $request->validate([
-            'role' => 'required|in:admin,supplier',
+            'role' => 'required|in:admin,supplier,super_admin',
             'email' => 'required|string|email|max:255|unique:users',
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
             'name' => 'nullable|required_if:role,admin|string|max:255',
@@ -44,27 +52,22 @@ class UserController extends Controller
             'specialty' => 'nullable|required_if:role,supplier|string|max:255',
         ]);
 
-        DB::transaction(function () use ($request) {
+        if (auth()->user()->role !== 'super_admin') {
+            abort(403, 'Unauthorized action.');
+        }
 
-            $role = $request->role;
+        $user = User::create([
+            'name' => $request->name,
+            'email' => $request->email,
+            'password' => Hash::make($request->password),
+            'role' => $request->role,
+        ]);
 
-            $user = User::create([
-                'name' => ($role == 'admin') ? $request->name : $request->first_name . ' ' . $request->last_name,
-                'email' => $request->email,
-                'password' => Hash::make($request->password),
-                'role' => $role,
-            ]);
+        if ($request->role === 'admin' && $request->has('stores')) {
+            $user->stores()->attach($request->stores);
+        }
 
-            if ($role == 'supplier') {
-                $user->SupplierProfile()->create([
-                    'first_name' => $request->first_name,
-                    'last_name' => $request->last_name,
-                    'specialty' => $request->specialty,
-                ]);
-            }
-        });
-
-        return redirect()->route('admin.users.index')->with('success', 'Utilisateur créé avec succès.');
+        return redirect()->route('admin.users.index')->with('success', 'Created successfully');
     }
 
     /**
@@ -73,7 +76,8 @@ class UserController extends Controller
     public function edit($id)
     {
         $user = User::with('SupplierProfile')->findOrFail($id);
-        return view('admin.users.edit', compact('user'));
+        $stores = Store::orderBy('name')->get();
+        return view('admin.users.edit', compact('user', 'stores'));
     }
 
     /**
@@ -86,36 +90,28 @@ class UserController extends Controller
         $request->validate([
             'email' => 'required|string|email|max:255|unique:users,email,' . $user->id,
             'password' => ['nullable', 'confirmed', Rules\Password::defaults()],
-
+            'role' => 'required|in:admin,supplier,super_admin',
             'name' => 'nullable|required_if:role,admin|string|max:255',
             'first_name' => 'nullable|required_if:role,supplier|string|max:255',
             'last_name' => 'nullable|required_if:role,supplier|string|max:255',
             'specialty' => 'nullable|required_if:role,supplier|string|max:255',
         ]);
 
-        DB::transaction(function () use ($request, $user) {
+        $user->update([
+            'name' => $request->name,
+            'email' => $request->email,
+            'password' => Hash::make($request->password),
+            'role' => $request->role,
+        ]);
 
-            $userData = [
-                'name' => ($user->role == 'admin') ? $request->name : $request->first_name . ' ' . $request->last_name,
-                'email' => $request->email,
-            ];
+        if ($request->role === 'admin') {
+            $user->stores()->sync($request->input('stores', []));
+        } else {
+            $user->stores()->detach();
+        }
 
-            if ($request->filled('password')) {
-                $userData['password'] = Hash::make($request->password);
-            }
 
-            $user->update($userData);
-
-            if ($user->role == 'supplier' && $user->SupplierProfile) {
-                $user->SupplierProfile->update([
-                    'first_name' => $request->first_name,
-                    'last_name' => $request->last_name,
-                    'specialty' => $request->specialty,
-                ]);
-            }
-        });
-
-        return redirect()->route('admin.users.index')->with('success', 'Utilisateur mis à jour.');
+        return redirect()->route('admin.users.index')->with('success', 'Updated successfully');
     }
 
     /**

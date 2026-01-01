@@ -20,11 +20,10 @@ return new class extends Migration
             $table->string('image_path')->nullable();
             $table->string('color')->nullable();
             $table->string('size')->nullable();
-            $table->text('note')->nullable();
             $table->string('status')->default('main_time');
             $table->integer('main_days_allocated');
-            $table->integer('extra_days_allocated'); 
-            $table->integer('days_spent_main')->default(0); 
+            $table->integer('extra_days_allocated');
+            $table->integer('days_spent_main')->default(0);
             $table->integer('days_spent_extra')->default(0);
             $table->timestamps();
         });

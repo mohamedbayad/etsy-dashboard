@@ -10,38 +10,87 @@ use Illuminate\Http\Request;
 
 class AdminDashboardController extends Controller
 {
-    public function index( Request $request )
+    public function index(Request $request)
     {
-        // we count the total orders, extra time orders and total Suppliers
-        $totalOrders = Order::count();
-        $extraTimeOrders = Order::where('status', 'extra_time')->count();
-        $totalSuppliers = Supplier::count();
+        $user = auth()->user();
 
-        // last 10 orders
-        $recentOrders = Order::with(['store', 'supplier'])
-                            ->orderBy('created_at', 'desc')
-                            ->take(10)
-                            ->get();
-
+        // 1. --- BASE QUERY & PERMISSIONS (For Orders) ---
         $query = Order::with(['store', 'supplier']);
+        $allowedStoreIds = [];
 
-        if ($request->filled('supplier_id')) {
-            $query->where('supplier_id', $request->supplier_id);
+        if ($user->role === 'admin') {
+            // Get assigned store IDs
+            $allowedStoreIds = $user->stores()->pluck('stores.id')->toArray();
+
+            if (!empty($allowedStoreIds)) {
+                $query->whereIn('store_id', $allowedStoreIds);
+            } else {
+                $query->where('id', 0); // No access
+            }
         }
 
-        if ($request->filled('store_id')) {
-            $query->where('store_id', $request->store_id);
-        }
+        // 2. --- CALCULATE STATS (KPIs) ---
 
-        if ($request->filled('sort') && in_array($request->sort, ['asc', 'desc'])) {
-            $query->orderBy('created_at', $request->sort);
+        // Orders Stats
+        $statsQuery = $query->clone();
+        $totalOrders = $statsQuery->count();
+        $extraTimeOrders = $statsQuery->clone()->where('status', 'extra_time')->count();
+
+        // --- UPDATED: Suppliers Stats Logic ---
+        if ($user->role === 'admin') {
+            // Only count suppliers linked to the admin's assigned stores
+            $totalSuppliers = Supplier::whereHas('orders', function($q) use ($allowedStoreIds) {
+                $q->whereIn('store_id', $allowedStoreIds);
+            })->count();
         } else {
-            $query->orderBy('created_at', 'desc');
+            // Super Admin sees total count of all suppliers in database
+            $totalSuppliers = Supplier::count();
         }
 
+        // 3. --- APPLY SEARCH FILTERS (For the Orders Table) ---
+
+        // Filter by Store
+        if ($request->filled('store_id')) {
+            if ($user->role === 'super_admin' || in_array($request->store_id, $allowedStoreIds)) {
+                $query->where('store_id', $request->store_id);
+            }
+        }
+
+        // Filter by Supplier
+        if ($request->filled('supplier_id')) {
+            $query->where('Supplier_id', $request->supplier_id);
+        }
+
+        // 4. --- SORTING LOGIC ---
+        if ($request->filled('sort_retard')) {
+            if ($request->sort_retard == 'most_retarded') {
+                $query->orderBy('days_spent_extra', 'desc');
+            } elseif ($request->sort_retard == 'least_retarded') {
+                $query->orderBy('days_spent_extra', 'asc');
+            }
+        } else {
+            // Default Priority Sorting
+            $query->orderBy('days_spent_extra', 'desc')
+                  ->orderBy('days_spent_main', 'desc')
+                  ->orderBy('order_date', 'asc');
+        }
+
+        // 5. --- GET DATA ---
         $orders = $query->get();
-        $suppliers = Supplier::orderBy('first_name')->get();
-        $stores = Store::orderBy('name')->get();
+
+        // 6. --- PREPARE DROPDOWNS ---
+        if ($user->role === 'admin') {
+            $stores = $user->stores;
+
+            // Filter Suppliers dropdown to only show relevant ones
+            $suppliers = Supplier::whereHas('orders', function($q) use ($allowedStoreIds) {
+                $q->whereIn('store_id', $allowedStoreIds);
+            })->orderBy('first_name')->get();
+
+        } else {
+            $stores = Store::orderBy('name')->get();
+            $suppliers = Supplier::orderBy('first_name')->get();
+        }
 
         return view('admin.dashboard', compact(
             'totalOrders',

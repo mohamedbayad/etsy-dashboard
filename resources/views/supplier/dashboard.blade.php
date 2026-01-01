@@ -26,14 +26,13 @@
                                 <label for="sort" class="text-sm font-medium leading-none">
                                     Sort by Date
                                 </label>
-                                <select id="sort" name="sort"
-                                    class="flex h-10 w-full items-center justify-between rounded-md border border-input bg-transparent px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2">
-
-                                    <option class="dark:text-black" value="desc" {{ request('sort', 'desc') == 'desc' ? 'selected' : '' }}>
-                                        Last Order (Newest First)
+                                <select name="sort_retard" class="flex h-10 w-full items-center justify-between rounded-md border border-input bg-transparent px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2">
+                                    <option value="">Default Priority</option>
+                                    <option value="most_retarded" class="dark:text-black" {{ request('sort_retard') == 'most_retarded' ? 'selected' : '' }}>
+                                        Most Retarded (Worst First)
                                     </option>
-                                    <option class="dark:text-black" value="asc" {{ request('sort') == 'asc' ? 'selected' : '' }}>
-                                        First Order (Oldest First)
+                                    <option value="least_retarded" class="dark:text-black" {{ request('sort_retard') == 'least_retarded' ? 'selected' : '' }}>
+                                        Least Retarded (Best First)
                                     </option>
                                 </select>
                             </div>
@@ -112,65 +111,65 @@
                                         @endif
                                     </td>
 
+
+                                    <!-- Main Time -->
                                     <td class="p-4 align-middle font-medium">
                                         @if($order->status == 'main_time')
                                         <div class="text-green-600 dark:text-green-400">
-                                            {{ $order->main_days_allocated - $order->days_spent_main }} days
-                                        </div>
-                                        <div class="text-xs text-muted-foreground">({{ $order->days_spent_main }}/{{ $order->main_days_allocated }})</div>
-                                        @else
-                                        <div class="text-red-600 dark:text-red-400">Finished</div>
-                                        @endif
-                                    </td>
-
-                                    <td class="p-4 align-middle font-medium">
-                                        @if ( $order->extra_days_allocated - $order->days_spent_extra >= 0)
-                                            @if($order->status == 'extra_time')
-                                            <div class="text-red-600 dark:text-red-400">
-                                                {{ $order->extra_days_allocated - $order->days_spent_extra }} days
-                                            </div>
-                                            <div class="text-xs text-muted-foreground">({{ $order->days_spent_extra }}/{{ $order->extra_days_allocated }})</div>
-                                            @else
-                                                <div class="text-muted-foreground">N/A</div>
-                                            @endif
-                                        @else
-                                            <div class="text-red-600 dark:text-red-400">Extra time exhausted</div>
-                                        @endif
-                                    </td>
-
-                                    <td class="p-4 align-middle font-medium">
-                                        @if($order->status == 'extra_time')
-
-                                        @php
-                                        // N7sbo l-baqi hna
-                                        $daysRemaining = $order->extra_days_allocated - $order->days_spent_extra;
-                                        @endphp
-
-                                        @if($daysRemaining >= 0)
-                                        <div class="text-orange-600">
-                                            {{ $daysRemaining }} Days left
+                                            {{ $order->main_days_allocated - $order->days_spent_main }} Days
                                         </div>
                                         <div class="text-xs text-muted-foreground">
-                                            ({{ $order->days_spent_extra }}/{{ $order->extra_days_allocated }})
+                                            ({{ $order->days_spent_main }}/{{ $order->main_days_allocated }})
                                         </div>
-                                        @else
-                                        <div class="text-red-700 font-extrabold flex items-center">
-                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                            </svg>
-                                            {{ $daysRemaining }} Days (Retard)
+                                        @elseif($order->status == 'extra_time')
+                                        <div class=" text-base text-red-600 dark:text-red-400"> ({{ $order->days_spent_main }}/{{ $order->main_days_allocated }}) <span class=" text-xs ">days</span><br>
+                                            <div class="text-xs text-muted-foreground text-black dark:text-gray-400">
+                                                Time has been passed
+                                            </div>
                                         </div>
-                                        <div class="text-xs text-red-400">
-                                            Overdue by {{ abs($daysRemaining) }} days
-                                        </div>
-                                        @endif
-
                                         @else
                                         <div class="text-muted-foreground">N/A</div>
                                         @endif
                                     </td>
 
-                                    
+                                    <!-- Extra Time -->
+                                    <td class="p-4 align-middle font-medium">
+                                        @if ( $order->extra_days_allocated - $order->days_spent_extra > 0)
+                                        @if($order->status == 'extra_time')
+                                        <div class="text-red-600 dark:text-red-400">
+                                            {{ $order->extra_days_allocated - $order->days_spent_extra }} Days
+                                        </div>
+                                        <div class="text-xs text-muted-foreground">
+                                            ({{ $order->days_spent_extra }}/{{ $order->extra_days_allocated }})
+                                        </div>
+                                        @else
+                                        <div class="text-muted-foreground">N/A</div>
+                                        @endif
+                                        @else
+                                        <div class=" text-base text-red-600 dark:text-red-400"> ({{ $order->extra_days_allocated }}/{{ $order->extra_days_allocated }}) <span class=" text-xs ">days</span><br>
+                                            <div class="text-xs text-muted-foreground text-black dark:text-gray-400">
+                                                Time has been passed
+                                            </div>
+                                        </div>
+                                        @endif
+                                    </td>
+
+                                    <!-- Days Retarded -->
+                                    <td class="p-4 align-middle font-medium">
+                                        @if ($order->days_retarded == 0)
+                                            <div class=" text-white font-extrabold flex items-center">
+                                                N/A
+                                            </div>
+                                        @else
+                                            <div class="text-red-700 font-extrabold flex items-center">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                </svg>
+                                                {{ $order->days_retarded }} Days (Retard)
+                                            </div>
+                                        @endif
+                                    </td>
+
                                     <td class="p-4 align-middle font-medium">
                                         {{ $order->order_date->format('d/m/Y') }}
                                     </td>

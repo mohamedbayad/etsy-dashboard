@@ -35,14 +35,17 @@ Route::middleware(['auth', 'verified'])->group(function () {
 });
 
 
-Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
+Route::middleware(['auth', 'role:admin,super_admin'])->prefix('admin')->name('admin.')->group(function () {
 
     Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
-
-    Route::resource('users', UserController::class);
     Route::resource('stores', StoreController::class);
     Route::resource('suppliers', SupplierController::class);
     Route::resource('orders', OrderController::class);
+});
+
+Route::middleware(['auth', 'role:super_admin'])->prefix('admin')->name('admin.')->group(function () {
+
+    Route::resource('users', UserController::class);
 });
 
 

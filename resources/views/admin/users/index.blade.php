@@ -40,6 +40,10 @@
                                                 <div class="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold border-transparent bg-primary text-primary-foreground">
                                                     Admin
                                                 </div>
+                                            @elseif ($user->role == 'super_admin')
+                                                <div class="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold border-transparent bg-secondary text-secondary-foreground">
+                                                    Super Admin
+                                                </div>
                                             @else
                                                 <div class="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold border-transparent bg-secondary text-secondary-foreground">
                                                     Supplier
