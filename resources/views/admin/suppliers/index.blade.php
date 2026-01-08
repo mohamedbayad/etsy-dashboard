@@ -58,7 +58,7 @@
                 @empty
                     <div class="col-span-full text-center p-12">
                         <p class="text-muted-foreground">Makayn 7ta Supplier.</p>
-                        <a href="{{ route('admin.Suppliers.create') }}"
+                        <a href="{{ route('admin.suppliers.create') }}"
                            class="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2 mt-4">
                             Ajouter Lowel
                         </a>
