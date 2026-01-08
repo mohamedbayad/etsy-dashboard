@@ -56,12 +56,22 @@ class UserController extends Controller
             abort(403, 'Unauthorized action.');
         }
 
+
         $user = User::create([
             'name' => $request->role == 'supplier' ?  "$request->first_name $request->last_name " : $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
             'role' => $request->role,
         ]);
+
+        if ($request->role == "supplier") {
+            Supplier::create([
+                'user_id' => $user->id,
+                'first_name' => $request->first_name,
+                'last_name' => $request->last_name,
+                'specialty' => $request->specialty,
+            ]);
+        }
 
         if ($request->role === 'admin' && $request->has('stores')) {
             $user->stores()->attach($request->stores);
