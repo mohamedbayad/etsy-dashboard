@@ -17,7 +17,7 @@ class SupplierController extends Controller
      */
     public function index()
     {
-        $suppliers = Supplier::withCount('orders')->orderBy('first_name')->get();
+        $suppliers = Supplier::with('user')->orderBy('created_at', 'desc')->get();
         return view('admin.suppliers.index', compact('suppliers'));
     }
 

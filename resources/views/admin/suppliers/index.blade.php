@@ -17,34 +17,34 @@
 
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
 
-                @forelse ($suppliers as $Supplier)
+                @forelse ($suppliers as $supplier)
                     <div class="rounded-xl border bg-card text-card-foreground shadow flex flex-col">
 
                         <div class="p-6">
                             <h3 class="text-xl font-semibold tracking-tight">
-                                {{ $Supplier->first_name }} {{ $Supplier->last_name }}
+                                {{ $supplier->first_name }} {{ $supplier->last_name }}
                             </h3>
-                            <p class="text-sm text-muted-foreground">{{ $Supplier->specialty }}</p>
+                            <p class="text-sm text-muted-foreground">{{ $supplier->specialty }}</p>
                         </div>
 
                         <div class="p-6 pt-0 text-muted-foreground">
-                            <span class="font-bold text-foreground">{{ $Supplier->orders_count }}</span>
+                            <span class="font-bold text-foreground">{{ $supplier->orders_count }}</span>
                             Orders Actifs
                         </div>
 
                         <div class="flex items-center p-6 pt-0 mt-auto border-t border-border"> <div class="flex space-x-2 w-full">
 
-                                <a href="{{ route('admin.suppliers.show', $Supplier->id) }}"
+                                <a href="{{ route('admin.suppliers.show', $supplier->id) }}"
                                    class="flex-1 inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors bg-primary text-primary-foreground hover:bg-primary/90 h-9 px-3">
                                     Voir Orders
                                 </a>
 
-                                <!-- <a href="{{ route('admin.suppliers.edit', $Supplier->id) }}"
+                                <!-- <a href="{{ route('admin.suppliers.edit', $supplier->id) }}"
                                    class="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors border border-input bg-background hover:bg-accent h-9 w-9 p-0">
                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="h-4 w-4"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg>
                                 </a>
 
-                                <form action="{{ route('admin.suppliers.destroy', $Supplier->id) }}" method="POST" onsubmit="return confirm('Wash sure?');">
+                                <form action="{{ route('admin.suppliers.destroy', $supplier->id) }}" method="POST" onsubmit="return confirm('Wash sure?');">
                                     @csrf
                                     @method('DELETE')
                                     <button type="submit"
