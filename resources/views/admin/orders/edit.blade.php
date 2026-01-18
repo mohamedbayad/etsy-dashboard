@@ -138,21 +138,21 @@
                                             <select id="status" name="status" required
                                                 class="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring">
                                                 <option value="pending" {{ old('status', $order->status) == 'pending' ? 'selected' : '' }}>Pending</option>
-                                                <option value="main_time" {{ old('status', $order->status) == 'main_time' ? 'selected' : '' }}>Main time</option>
-                                                <option value="extra_time" {{ old('status', $order->status) == 'extra_time' ? 'selected' : '' }}>Extra Time</option>
+                                                <option value="main_time" {{ old('status', $order->status) == 'main_time' ? 'selected' : '' }}>Opened Orders</option>
+                                                <option value="extra_time" {{ old('status', $order->status) == 'extra_time' ? 'selected' : '' }}>Extended Orders</option>
                                                 <option value="completed" {{ old('status', $order->status) == 'completed' ? 'selected' : '' }}>Complete</option>
                                             </select>
                                         </div>
 
                                         <div class="space-y-2">
-                                            <label for="main_days_allocated" class="text-sm font-medium leading-none">Main Time (days) <span class="text-red-500">*</span></label>
+                                            <label for="main_days_allocated" class="text-sm font-medium leading-none">Opened Orders (days) <span class="text-red-500">*</span></label>
                                             <input type="number" name="main_days_allocated" id="main_days_allocated" required
                                                 value="{{ old('main_days_allocated', $order->main_days_allocated) }}"
                                                 class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2">
                                         </div>
 
                                         <div class="space-y-2">
-                                            <label for="extra_days_allocated" class="text-sm font-medium leading-none">Extra Time (days) <span class="text-red-500">*</span></label>
+                                            <label for="extra_days_allocated" class="text-sm font-medium leading-none">Extended Orders (days) <span class="text-red-500">*</span></label>
                                             <input type="number" name="extra_days_allocated" id="extra_days_allocated" required
                                                 value="{{ old('extra_days_allocated', $order->extra_days_allocated) }}"
                                                 class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2">

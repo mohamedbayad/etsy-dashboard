@@ -56,8 +56,8 @@
                             <select id="status" name="status"
                                 class="flex h-10 w-full items-center justify-between rounded-md border border-input bg-transparent px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2">
                                 <option class="dark:text-black" value="pending" {{ old('status') == 'pending' ? 'selected' : '' }}>Pending</option>
-                                <option class="dark:text-black" value="main_time" {{ old('status') == 'main_time' ? 'selected' : '' }}>Main time</option>
-                                <option class="dark:text-black" value="extra_time" {{ old('status') == 'extra_time' ? 'selected' : '' }}>Extra Time</option>
+                                <option class="dark:text-black" value="main_time" {{ old('status') == 'main_time' ? 'selected' : '' }}>Opened Orders</option>
+                                <option class="dark:text-black" value="extra_time" {{ old('status') == 'extra_time' ? 'selected' : '' }}>Extended Orders</option>
                                 <option class="dark:text-black" value="completed" {{ old('status') == 'completed' ? 'selected' : '' }}>Complete</option>
                             </select>
                             @error('status')

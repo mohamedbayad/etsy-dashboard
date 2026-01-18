@@ -38,20 +38,23 @@
                         </div>
                     </form>
 
+                    <div class="mb-3 text-sm text-muted-foreground">
+                        Orders: {{ $orders->count() }}
+                    </div>
                     <div class="relative w-full overflow-auto">
 
                         <table class="w-full caption-bottom text-sm">
 
                             <thead class="[&_tr]:border-b">
                                 <tr class="border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted">
+                                    <th class="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Customer</th>
                                     <th class="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Image</th>
                                     <th class="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Details (Color/Size)</th>
                                     <th class="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Store</th>
                                     <th class="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Status</th>
                                     <th class="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Supplier</th>
-                                    <th class="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Customer</th>
-                                    <th class="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Main Time</th>
-                                    <th class="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Extra Time</th>
+                                    <th class="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Opened Orders</th>
+                                    <th class="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Extended Orders</th>
                                     <th class="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Actions</th>
                                 </tr>
                             </thead>
@@ -59,6 +62,10 @@
                             <tbody class="[&_tr:last-child]:border-0">
                                 @forelse ($orders as $order)
                                     <tr class="border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted">
+
+                                        <td class="p-4 align-middle text-muted-foreground">
+                                            {{ $order->customer_name ?? 'N/A' }}
+                                        </td>
 
                                         <td class="p-4 align-middle">
                                             @if($order->image_path)
@@ -82,12 +89,12 @@
                                         <td class="p-4 align-middle">
                                             @if($order->status == 'main_time')
                                                 <div class="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold border-transparent bg-orange-500 text-white">
-                                                    Main Time
+                                                    Opened Orders
                                                 </div>
 
                                             @elseif($order->status == 'extra_time')
                                                 <div class="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold border-transparent bg-destructive text-destructive-foreground">
-                                                    Extra Time
+                                                    Extended Orders
                                                 </div>
 
                                             @elseif($order->status == 'completed')
@@ -104,10 +111,6 @@
 
                                         <td class="p-4 align-middle text-muted-foreground">
                                             {{ $order->Supplier->first_name ?? 'N/A' }}
-                                        </td>
-
-                                        <td class="p-4 align-middle text-muted-foreground">
-                                            {{ $order->customer_name ?? 'N/A' }}
                                         </td>
 
                                         <td class="p-4 align-middle font-medium">
