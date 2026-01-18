@@ -58,6 +58,7 @@
                                 <option class="dark:text-black" value="pending" {{ old('status') == 'pending' ? 'selected' : '' }}>Pending</option>
                                 <option class="dark:text-black" value="main_time" {{ old('status') == 'main_time' ? 'selected' : '' }}>Opened Orders</option>
                                 <option class="dark:text-black" value="extra_time" {{ old('status') == 'extra_time' ? 'selected' : '' }}>Extended Orders</option>
+                                <option class="dark:text-black" value="not_shipped" {{ old('status') == 'not_shipped' ? 'selected' : '' }}>Not Shipped</option>
                                 <option class="dark:text-black" value="completed" {{ old('status') == 'completed' ? 'selected' : '' }}>Complete</option>
                             </select>
                             @error('status')

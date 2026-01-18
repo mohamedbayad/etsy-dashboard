@@ -34,7 +34,7 @@ class AdminDashboardController extends Controller
         // Orders Stats
         $statsQuery = $query->clone();
         $totalOrders = $statsQuery->count();
-        $extraTimeOrders = $statsQuery->clone()->where('status', 'extra_time')->count();
+        $extraTimeOrders = $statsQuery->clone()->whereIn('status', ['extra_time', 'not_shipped'])->count();
 
         // --- UPDATED: Suppliers Stats Logic ---
         if ($user->role === 'admin') {
@@ -84,7 +84,7 @@ class AdminDashboardController extends Controller
         }
 
         // 5. --- GET DATA ---
-        $orders = $query->get();
+        $orders = $query->paginate(15)->withQueryString();
 
         // 6. --- PREPARE DROPDOWNS ---
         if ($user->role === 'admin') {

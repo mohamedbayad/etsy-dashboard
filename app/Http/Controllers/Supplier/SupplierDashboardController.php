@@ -43,7 +43,7 @@ class SupplierDashboardController extends Controller
             $query->orderBy('order_date', 'asc');
         }
 
-        $orders = $query->get();
+        $orders = $query->paginate(15)->withQueryString();
 
 
         return view('supplier.dashboard',

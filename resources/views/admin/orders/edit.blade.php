@@ -140,6 +140,7 @@
                                                 <option value="pending" {{ old('status', $order->status) == 'pending' ? 'selected' : '' }}>Pending</option>
                                                 <option value="main_time" {{ old('status', $order->status) == 'main_time' ? 'selected' : '' }}>Opened Orders</option>
                                                 <option value="extra_time" {{ old('status', $order->status) == 'extra_time' ? 'selected' : '' }}>Extended Orders</option>
+                                                <option value="not_shipped" {{ old('status', $order->status) == 'not_shipped' ? 'selected' : '' }}>Not Shipped</option>
                                                 <option value="completed" {{ old('status', $order->status) == 'completed' ? 'selected' : '' }}>Complete</option>
                                             </select>
                                         </div>

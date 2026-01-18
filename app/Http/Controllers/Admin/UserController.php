@@ -18,7 +18,7 @@ class UserController extends Controller
      */
     public function index()
     {
-        $users = User::with('SupplierProfile')->orderBy('created_at', 'desc')->get();
+        $users = User::with('SupplierProfile')->orderBy('created_at', 'desc')->paginate(15);
         return view('admin.users.index', compact('users'));
     }
 

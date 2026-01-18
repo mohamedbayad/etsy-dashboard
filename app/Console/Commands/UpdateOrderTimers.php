@@ -39,18 +39,18 @@ class UpdateOrderTimers extends Command
                 $order->days_spent_main = $daysPassed;
                 $order->days_spent_extra = 0;
                 $order->days_retarded = 0;
-            }
-            else {
-                $order->status = 'extra_time';
+            } else {
                 $order->days_spent_main = $order->main_days_allocated;
 
-                if ($daysPassed - $order->days_spent_main < $order->extra_days_allocated) {
-                    $order->days_spent_extra = $daysPassed - $order->days_spent_main;
+                $extraElapsed = $daysPassed - $order->days_spent_main;
+                if ($extraElapsed < $order->extra_days_allocated) {
+                    $order->status = 'extra_time';
+                    $order->days_spent_extra = $extraElapsed;
                     $order->days_retarded = 0;
-                }
-                else {
+                } else {
+                    $order->status = 'not_shipped';
                     $order->days_spent_extra = $order->extra_days_allocated;
-                    $order->days_retarded = $daysPassed;
+                    $order->days_retarded = $extraElapsed - $order->extra_days_allocated;
                 }
             }
 

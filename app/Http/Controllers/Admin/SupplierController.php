@@ -78,7 +78,7 @@ class SupplierController extends Controller
             }
         }
 
-        $orders = $ordersQuery->get();
+        $orders = $ordersQuery->paginate(15)->withQueryString();
 
         return view('admin.suppliers.show', compact('supplier', 'orders'));
     }

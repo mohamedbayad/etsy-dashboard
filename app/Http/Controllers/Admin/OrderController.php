@@ -78,7 +78,7 @@ class OrderController extends Controller
             ->orderBy('order_date', 'asc');
 
         // 4. --- GET DATA ---
-        $orders = $query->get();
+        $orders = $query->paginate(15)->withQueryString();
 
         // 5. --- PREPARE DROPDOWNS (Smart Filters) ---
         if ($user->role === 'admin') {
@@ -107,7 +107,7 @@ class OrderController extends Controller
     {
         $data = $request->validate([
             'customer_names' => 'required|string',
-            'status' => 'required|in:pending,main_time,extra_time,completed',
+            'status' => 'required|in:pending,main_time,extra_time,not_shipped,completed',
         ]);
 
         $rawNames = preg_split('/,/', $data['customer_names']);
@@ -279,7 +279,7 @@ class OrderController extends Controller
             'store_id' => 'required|exists:stores,id',
             'order_date' => 'required|date',
             'supplier_id' => 'required|exists:suppliers,id',
-            'status' => 'required|in:pending,main_time,extra_time,completed',
+            'status' => 'required|in:pending,main_time,extra_time,not_shipped,completed',
             'color' => 'nullable|string',
             'size' => 'nullable|string',
             'main_days_allocated' => 'required|integer|min:1',

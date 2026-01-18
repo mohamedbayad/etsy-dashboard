@@ -109,7 +109,7 @@
 
                 <div class="p-6 pt-0">
                     <div class="mb-3 text-sm text-muted-foreground">
-                        Orders: {{ $orders->count() }}
+                        Orders: {{ $orders->total() }}
                     </div>
                     <div class="relative w-full overflow-auto">
                         <table class="w-full caption-bottom text-sm">
@@ -171,6 +171,11 @@
                                             Extended Orders
                                         </div>
 
+                                        @elseif($order->status == 'not_shipped')
+                                        <div class="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold border-transparent bg-red-700 text-white">
+                                            Not Shipped
+                                        </div>
+
                                         @elseif($order->status == 'completed')
                                         <div class="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold border-transparent bg-green-600 text-white">
                                             Completed
@@ -197,7 +202,7 @@
                                         <div class="text-xs text-muted-foreground">
                                             ({{ $order->days_spent_main }}/{{ $order->main_days_allocated }})
                                         </div>
-                                        @elseif($order->status == 'extra_time')
+                                        @elseif($order->status == 'extra_time' || $order->status == 'not_shipped')
                                         <div class=" text-base text-red-600 dark:text-red-400"> ({{ $order->days_spent_main }}/{{ $order->main_days_allocated }}) <span class=" text-xs ">days</span><br>
                                             <div class="text-xs text-muted-foreground text-black dark:text-gray-400">
                                                 Time has been passed
@@ -279,6 +284,9 @@
                                 @endforelse
                             </tbody>
                         </table>
+                    </div>
+                    <div class="mt-4">
+                        {{ $orders->links() }}
                     </div>
                 </div>
             </div>
