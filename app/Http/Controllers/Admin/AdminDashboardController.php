@@ -61,6 +61,14 @@ class AdminDashboardController extends Controller
             $query->where('Supplier_id', $request->supplier_id);
         }
 
+        // Filter by Customer Name
+        if ($request->filled('customer_name')) {
+            $customerName = trim($request->customer_name);
+            if ($customerName !== '') {
+                $query->where('customer_name', 'like', '%' . $customerName . '%');
+            }
+        }
+
         // 4. --- SORTING LOGIC ---
         if ($request->filled('sort_retard')) {
             if ($request->sort_retard == 'most_retarded') {

@@ -138,9 +138,9 @@
                                             <select id="status" name="status" required
                                                 class="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring">
                                                 <option value="pending" {{ old('status', $order->status) == 'pending' ? 'selected' : '' }}>Pending</option>
-                                                <option value="main_time" {{ old('status', $order->status) == 'main_time' ? 'selected' : '' }}>Main Time</option>
+                                                <option value="main_time" {{ old('status', $order->status) == 'main_time' ? 'selected' : '' }}>Main time</option>
                                                 <option value="extra_time" {{ old('status', $order->status) == 'extra_time' ? 'selected' : '' }}>Extra Time</option>
-                                                <option value="completed" {{ old('status', $order->status) == 'completed' ? 'selected' : '' }}>Completed</option>
+                                                <option value="completed" {{ old('status', $order->status) == 'completed' ? 'selected' : '' }}>Complete</option>
                                             </select>
                                         </div>
 

@@ -16,6 +16,28 @@
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="rounded-xl border bg-card text-card-foreground shadow">
                 <div class="p-6">
+                    <form action="{{ route('admin.suppliers.show', $supplier->id) }}" method="GET" class="mb-6 pb-6 border-b border-border">
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
+                            <div class="space-y-2">
+                                <label for="customer_name" class="text-sm font-medium leading-none">Customer Name</label>
+                                <input id="customer_name" name="customer_name" type="text" value="{{ request('customer_name') }}"
+                                    placeholder="Search customer"
+                                    class="flex h-10 w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2">
+                            </div>
+
+                            <div class="flex space-x-2">
+                                <button type="submit"
+                                    class="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2">
+                                    Filter
+                                </button>
+                                <a href="{{ route('admin.suppliers.show', $supplier->id) }}"
+                                    class="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors border border-input bg-background hover:bg-accent h-10 px-4 py-2">
+                                    Clear
+                                </a>
+                            </div>
+                        </div>
+                    </form>
+
                     <div class="relative w-full overflow-auto">
 
                         <table class="w-full caption-bottom text-sm">
@@ -27,6 +49,7 @@
                                     <th class="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Store</th>
                                     <th class="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Status</th>
                                     <th class="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Supplier</th>
+                                    <th class="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Customer</th>
                                     <th class="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Main Time</th>
                                     <th class="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Extra Time</th>
                                     <th class="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Actions</th>
@@ -34,7 +57,7 @@
                             </thead>
 
                             <tbody class="[&_tr:last-child]:border-0">
-                                @forelse ($supplier->orders as $order)
+                                @forelse ($orders as $order)
                                     <tr class="border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted">
 
                                         <td class="p-4 align-middle">
@@ -81,6 +104,10 @@
 
                                         <td class="p-4 align-middle text-muted-foreground">
                                             {{ $order->Supplier->first_name ?? 'N/A' }}
+                                        </td>
+
+                                        <td class="p-4 align-middle text-muted-foreground">
+                                            {{ $order->customer_name ?? 'N/A' }}
                                         </td>
 
                                         <td class="p-4 align-middle font-medium">
@@ -131,7 +158,7 @@
                                     </tr>
                                 @empty
                                     <tr>
-                                        <td colspan="8" class="p-4 text-center text-muted-foreground">
+                                        <td colspan="9" class="p-4 text-center text-muted-foreground">
                                            No Orders.
                                         </td>
                                     </tr>

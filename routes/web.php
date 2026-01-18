@@ -40,6 +40,8 @@ Route::middleware(['auth', 'role:admin,super_admin'])->prefix('admin')->name('ad
     Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
     Route::resource('stores', StoreController::class);
     Route::resource('suppliers', SupplierController::class);
+    Route::get('orders/bulk-status', [OrderController::class, 'bulkStatusForm'])->name('orders.bulk-status');
+    Route::post('orders/bulk-status', [OrderController::class, 'bulkStatusUpdate'])->name('orders.bulk-status.update');
     Route::resource('orders', OrderController::class);
 });
 

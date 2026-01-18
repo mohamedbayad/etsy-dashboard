@@ -60,6 +60,14 @@ class OrderController extends Controller
             $query->where('Supplier_id', $request->supplier_id);
         }
 
+        // Filter by Customer Name
+        if ($request->filled('customer_name')) {
+            $customerName = trim($request->customer_name);
+            if ($customerName !== '') {
+                $query->where('customer_name', 'like', '%' . $customerName . '%');
+            }
+        }
+
         // 3. --- SORTING ---
         // Default sorting logic:
         // 1. Orders in Extra Time (High Delay) first
@@ -88,6 +96,83 @@ class OrderController extends Controller
         }
 
         return view('admin.orders.index', compact('orders', 'suppliers', 'stores'));
+    }
+
+    public function bulkStatusForm()
+    {
+        return view('admin.orders.bulk-status');
+    }
+
+    public function bulkStatusUpdate(Request $request)
+    {
+        $data = $request->validate([
+            'customer_names' => 'required|string',
+            'status' => 'required|in:pending,main_time,extra_time,completed',
+        ]);
+
+        $rawNames = preg_split('/,/', $data['customer_names']);
+        $inputMap = [];
+        foreach ($rawNames as $rawName) {
+            $name = trim($rawName);
+            if ($name === '') {
+                continue;
+            }
+            $lower = strtolower($name);
+            if (!isset($inputMap[$lower])) {
+                $inputMap[$lower] = $name;
+            }
+        }
+
+        if (empty($inputMap)) {
+            return back()
+                ->withErrors(['customer_names' => 'Please provide at least one customer name.'])
+                ->withInput();
+        }
+
+        $user = auth()->user();
+        $query = Order::query();
+
+        if ($user->role === 'admin') {
+            $allowedStoreIds = $user->stores()->pluck('stores.id')->toArray();
+            if (!empty($allowedStoreIds)) {
+                $query->whereIn('store_id', $allowedStoreIds);
+            } else {
+                $query->where('id', 0);
+            }
+        }
+
+        $namesLower = array_keys($inputMap);
+        $matchQuery = clone $query;
+        $matchedLower = $matchQuery
+            ->select(DB::raw('LOWER(customer_name) as customer_lower'))
+            ->whereIn(DB::raw('LOWER(customer_name)'), $namesLower)
+            ->distinct()
+            ->pluck('customer_lower')
+            ->toArray();
+
+        $updateQuery = clone $query;
+        $updatedOrders = 0;
+        if (!empty($matchedLower)) {
+            $updatedOrders = $updateQuery
+                ->whereIn(DB::raw('LOWER(customer_name)'), $matchedLower)
+                ->update(['status' => $data['status']]);
+        }
+
+        $missingLower = array_values(array_diff($namesLower, $matchedLower));
+        $missingNames = array_map(function ($lower) use ($inputMap) {
+            return $inputMap[$lower];
+        }, $missingLower);
+
+        $updatedNames = array_map(function ($lower) use ($inputMap) {
+            return $inputMap[$lower];
+        }, $matchedLower);
+
+        return back()->with('bulk_status_summary', [
+            'updated_names' => $updatedNames,
+            'not_found_names' => $missingNames,
+            'updated_orders' => $updatedOrders,
+            'status' => $data['status'],
+        ]);
     }
 
     /**
@@ -194,7 +279,7 @@ class OrderController extends Controller
             'store_id' => 'required|exists:stores,id',
             'order_date' => 'required|date',
             'supplier_id' => 'required|exists:suppliers,id',
-            'status' => 'required|in:main_time,extra_time,completed',
+            'status' => 'required|in:pending,main_time,extra_time,completed',
             'color' => 'nullable|string',
             'size' => 'nullable|string',
             'main_days_allocated' => 'required|integer|min:1',

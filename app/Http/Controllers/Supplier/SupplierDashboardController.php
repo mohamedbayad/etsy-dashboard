@@ -28,6 +28,12 @@ class SupplierDashboardController extends Controller
         $query = $supplierProfile->orders()
                     ->with(['store', 'supplier']);
 
+        if ($request->filled('customer_name')) {
+            $customerName = trim($request->customer_name);
+            if ($customerName !== '') {
+                $query->where('customer_name', 'like', '%' . $customerName . '%');
+            }
+        }
 
         if ($request->filled('sort') && in_array($request->sort, ['asc', 'desc'])) {
             $query->orderBy('created_at', $request->sort);

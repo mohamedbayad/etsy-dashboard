@@ -41,7 +41,6 @@ class SupplierController extends Controller
             'email' => 'required|string|email|max:255|unique:users',
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
         ]);
-
         DB::transaction(function () use ($request) {
             $user = User::create([
                 'name' => $request->first_name . ' ' . $request->last_name,
@@ -63,11 +62,21 @@ class SupplierController extends Controller
     /**
      * Display the specified resource (PAGE DYAL TABLE)
      */
-    public function show($id)
+    public function show(Request $request, $id)
     {
-        $supplier = Supplier::with(['orders.store'])->findOrFail($id);
+        $supplier = Supplier::findOrFail($id);
+        $ordersQuery = $supplier->orders()->with(['store', 'supplier']);
 
-        return view('admin.suppliers.show', compact('supplier'));
+        if ($request->filled('customer_name')) {
+            $customerName = trim($request->customer_name);
+            if ($customerName !== '') {
+                $ordersQuery->where('customer_name', 'like', '%' . $customerName . '%');
+            }
+        }
+
+        $orders = $ordersQuery->get();
+
+        return view('admin.suppliers.show', compact('supplier', 'orders'));
     }
 
     /**

@@ -86,6 +86,13 @@
                                 </select>
                             </div>
 
+                            <div class="space-y-2">
+                                <label for="customer_name" class="text-sm font-medium leading-none">Customer Name</label>
+                                <input id="customer_name" name="customer_name" type="text" value="{{ request('customer_name') }}"
+                                    placeholder="Search customer"
+                                    class="flex h-10 w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2">
+                            </div>
+
                             <div class="flex space-x-2">
                                 <button type="submit"
                                     class="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2">
@@ -111,6 +118,7 @@
                                     <th class="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Store</th>
                                     <th class="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Status</th>
                                     <th class="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Supplier</th>
+                                    <th class="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Customer</th>
                                     <th class="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Main Time</th>
                                     <th class="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Extra Time</th>
                                     <th class="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Days</th>
@@ -170,6 +178,10 @@
 
                                     <td class="p-4 align-middle text-muted-foreground">
                                         {{ $order->Supplier->first_name ?? 'N/A' }}
+                                    </td>
+
+                                    <td class="p-4 align-middle text-muted-foreground">
+                                        {{ $order->customer_name ?? 'N/A' }}
                                     </td>
 
 
@@ -258,7 +270,7 @@
                                 </tr>
                                 @empty
                                 <tr>
-                                    <td colspan="8" class="p-4 text-center text-muted-foreground">
+                                    <td colspan="11" class="p-4 text-center text-muted-foreground">
                                         No Order Now.
                                     </td>
                                 </tr>
