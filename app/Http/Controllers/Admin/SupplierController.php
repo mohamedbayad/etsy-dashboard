@@ -70,6 +70,7 @@ class SupplierController extends Controller
     {
         $supplier = Supplier::findOrFail($id);
         $ordersQuery = $supplier->orders()->with(['store', 'supplier']);
+        $ordersQuery->where('status', '!=', 'completed');
 
         if ($request->filled('customer_name')) {
             $customerName = trim($request->customer_name);
@@ -78,7 +79,11 @@ class SupplierController extends Controller
             }
         }
 
-        $orders = $ordersQuery->paginate(15)->withQueryString();
+        if ($request->filled('status')) {
+            $ordersQuery->where('status', $request->status);
+        }
+
+        $orders = $ordersQuery->paginate(50)->withQueryString();
 
         return view('admin.suppliers.show', compact('supplier', 'orders'));
     }

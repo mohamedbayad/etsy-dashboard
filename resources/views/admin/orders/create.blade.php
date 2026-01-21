@@ -135,15 +135,15 @@
                                         </div>
 
                                         <div class="space-y-2 md:col-span-2">
-                                            <label for="image_path" class="text-sm font-medium leading-none">Product Image (Paste Ctrl+V supported)</label>
+                                            <label for="image_path" class="text-sm font-medium leading-none">Product Images (Paste Ctrl+V supported)</label>
 
                                             <div class="relative border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-6 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition ease-in-out duration-150 text-center" id="paste_area">
 
-                                                <input id="image_path" name="image_path" type="file" accept="image/*" class="hidden" onchange="previewImage(this)">
+                                                <input id="image_path" name="image_path[]" type="file" accept="image/*" multiple class="hidden" onchange="previewImage(this)">
 
                                                 <div id="preview_container" class="hidden flex-col items-center">
-                                                    <img id="preview_img" src="#" alt="Image Preview" class="max-h-64 rounded-lg shadow-md mb-3 border border-gray-200">
-                                                    <button type="button" onclick="removeImage()" class="text-xs text-red-500 hover:text-red-700 underline">Remove Image</button>
+                                                    <div id="preview_list" class="flex flex-wrap justify-center gap-2 mb-3"></div>
+                                                    <button type="button" onclick="removeImage()" class="text-xs text-red-500 hover:text-red-700 underline">Remove Images</button>
                                                 </div>
 
                                                 <div id="placeholder_text" class="cursor-pointer" onclick="document.getElementById('image_path').click()">
@@ -160,10 +160,16 @@
                                                         PNG, JPG, GIF up to 10MB
                                                     </p>
                                                     <p class="text-xs text-blue-500 font-bold mt-2">
-                                                        💡 Tip: Click anywhere and press Ctrl+V to paste image
+                                                        💡 Tip: Click anywhere and press Ctrl+V to paste images
                                                     </p>
                                                 </div>
                                             </div>
+                                        </div>
+
+                                        <div class="flex items-center gap-2 md:col-span-2">
+                                            <input id="compress_images" name="compress_images" type="checkbox" value="1"
+                                                class="h-4 w-4 rounded border border-input text-primary focus:ring-2 focus:ring-ring">
+                                            <label for="compress_images" class="text-sm text-muted-foreground">Compress uploaded images</label>
                                         </div>
                                         
                                     </div>

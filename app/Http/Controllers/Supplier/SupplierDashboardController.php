@@ -28,11 +28,17 @@ class SupplierDashboardController extends Controller
         $query = $supplierProfile->orders()
                     ->with(['store', 'supplier']);
 
+        $query->where('status', '!=', 'completed');
+
         if ($request->filled('customer_name')) {
             $customerName = trim($request->customer_name);
             if ($customerName !== '') {
                 $query->where('customer_name', 'like', '%' . $customerName . '%');
             }
+        }
+
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
         }
 
         if ($request->filled('sort') && in_array($request->sort, ['asc', 'desc'])) {
@@ -43,7 +49,7 @@ class SupplierDashboardController extends Controller
             $query->orderBy('order_date', 'asc');
         }
 
-        $orders = $query->paginate(15)->withQueryString();
+        $orders = $query->paginate(50)->withQueryString();
 
 
         return view('supplier.dashboard',

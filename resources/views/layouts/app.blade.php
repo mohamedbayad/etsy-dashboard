@@ -127,6 +127,9 @@
                     const fileInput = document.getElementById('image_path');
 
                     const dataTransfer = new DataTransfer();
+                    if (fileInput && fileInput.files) {
+                        Array.from(fileInput.files).forEach((file) => dataTransfer.items.add(file));
+                    }
                     dataTransfer.items.add(blob);
                     fileInput.files = dataTransfer.files;
 
@@ -143,19 +146,28 @@
         function previewImage(input) {
             const previewContainer = document.getElementById('preview_container');
             const placeholderText = document.getElementById('placeholder_text');
-            const previewImg = document.getElementById('preview_img');
+            const previewList = document.getElementById('preview_list');
+
+            if (!previewList) {
+                return;
+            }
 
             if (input.files && input.files[0]) {
-                const reader = new FileReader();
-
-                reader.onload = function(e) {
-                    previewImg.src = e.target.result;
-                    previewContainer.classList.remove('hidden');
-                    previewContainer.classList.add('flex');
-                    placeholderText.classList.add('hidden');
-                }
-
-                reader.readAsDataURL(input.files[0]);
+                previewList.innerHTML = '';
+                Array.from(input.files).forEach((file) => {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        const img = document.createElement('img');
+                        img.src = e.target.result;
+                        img.alt = 'Image Preview';
+                        img.className = 'h-20 w-20 rounded-lg object-cover border border-gray-200';
+                        previewList.appendChild(img);
+                    };
+                    reader.readAsDataURL(file);
+                });
+                previewContainer.classList.remove('hidden');
+                previewContainer.classList.add('flex');
+                placeholderText.classList.add('hidden');
             }
         }
 
@@ -163,11 +175,15 @@
             const input = document.getElementById('image_path');
             const previewContainer = document.getElementById('preview_container');
             const placeholderText = document.getElementById('placeholder_text');
+            const previewList = document.getElementById('preview_list');
 
             input.value = '';
             previewContainer.classList.add('hidden');
             previewContainer.classList.remove('flex');
             placeholderText.classList.remove('hidden');
+            if (previewList) {
+                previewList.innerHTML = '';
+            }
         }
     </script>
 </body>

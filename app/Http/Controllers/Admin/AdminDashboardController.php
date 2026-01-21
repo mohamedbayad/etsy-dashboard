@@ -29,25 +29,19 @@ class AdminDashboardController extends Controller
             }
         }
 
-        // 2. --- CALCULATE STATS (KPIs) ---
-
-        // Orders Stats
-        $statsQuery = $query->clone();
-        $totalOrders = $statsQuery->count();
-        $extraTimeOrders = $statsQuery->clone()->whereIn('status', ['extra_time', 'not_shipped'])->count();
-
         // --- UPDATED: Suppliers Stats Logic ---
+        $supplierBaseQuery = Supplier::whereHas('user');
         if ($user->role === 'admin') {
-            // Only count suppliers linked to the admin's assigned stores
-            $totalSuppliers = Supplier::whereHas('orders', function($q) use ($allowedStoreIds) {
+            // Only count suppliers linked to the admin's assigned stores and active users
+            $totalSuppliers = $supplierBaseQuery->whereHas('orders', function($q) use ($allowedStoreIds) {
                 $q->whereIn('store_id', $allowedStoreIds);
             })->count();
         } else {
-            // Super Admin sees total count of all suppliers in database
-            $totalSuppliers = Supplier::count();
+            // Super Admin sees total count of suppliers with user accounts
+            $totalSuppliers = $supplierBaseQuery->count();
         }
 
-        // 3. --- APPLY SEARCH FILTERS (For the Orders Table) ---
+        // 2. --- APPLY SEARCH FILTERS (For the Orders Table) ---
 
         // Filter by Store
         if ($request->filled('store_id')) {
@@ -69,6 +63,27 @@ class AdminDashboardController extends Controller
             }
         }
 
+        $query->where('status', '!=', 'completed');
+
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+
+        // 3. --- CALCULATE STATS (KPIs) USING FILTERED QUERY ---
+        $statsQuery = clone $query;
+        $totalOrders = $statsQuery->count();
+        $notShippedOrders = (clone $statsQuery)->where('status', 'not_shipped')->count();
+        $extraTimeOrders = (clone $statsQuery)->where('status', 'extra_time')->count();
+        $completedQuery = Order::query();
+        if ($user->role === 'admin') {
+            if (!empty($allowedStoreIds)) {
+                $completedQuery->whereIn('store_id', $allowedStoreIds);
+            } else {
+                $completedQuery->where('id', 0);
+            }
+        }
+        $completedOrders = $completedQuery->where('status', 'completed')->count();
+
         // 4. --- SORTING LOGIC ---
         if ($request->filled('sort_retard')) {
             if ($request->sort_retard == 'most_retarded') {
@@ -84,7 +99,7 @@ class AdminDashboardController extends Controller
         }
 
         // 5. --- GET DATA ---
-        $orders = $query->paginate(15)->withQueryString();
+        $orders = $query->paginate(50)->withQueryString();
 
         // 6. --- PREPARE DROPDOWNS ---
         if ($user->role === 'admin') {
@@ -102,7 +117,9 @@ class AdminDashboardController extends Controller
 
         return view('admin.dashboard', compact(
             'totalOrders',
+            'notShippedOrders',
             'extraTimeOrders',
+            'completedOrders',
             'totalSuppliers',
             'orders',
             'suppliers',

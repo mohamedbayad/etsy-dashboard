@@ -45,6 +45,8 @@ class OrderController extends Controller
             }
         }
 
+        $query->where('status', '!=', 'completed');
+
         // 2. --- FILTERS ---
 
         // Filter by Store
@@ -68,6 +70,10 @@ class OrderController extends Controller
             }
         }
 
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+
         // 3. --- SORTING ---
         // Default sorting logic:
         // 1. Orders in Extra Time (High Delay) first
@@ -78,7 +84,7 @@ class OrderController extends Controller
             ->orderBy('order_date', 'asc');
 
         // 4. --- GET DATA ---
-        $orders = $query->paginate(15)->withQueryString();
+        $orders = $query->paginate(50)->withQueryString();
 
         // 5. --- PREPARE DROPDOWNS (Smart Filters) ---
         if ($user->role === 'admin') {
@@ -96,6 +102,55 @@ class OrderController extends Controller
         }
 
         return view('admin.orders.index', compact('orders', 'suppliers', 'stores'));
+    }
+
+    public function completed(Request $request)
+    {
+        $user = auth()->user();
+        $query = Order::with(['store', 'supplier'])->where('status', 'completed');
+        $allowedStoreIds = [];
+
+        if ($user->role === 'admin') {
+            $allowedStoreIds = $user->stores()->pluck('stores.id')->toArray();
+
+            if (!empty($allowedStoreIds)) {
+                $query->whereIn('store_id', $allowedStoreIds);
+            } else {
+                $query->where('id', 0);
+            }
+        }
+
+        if ($request->filled('store_id')) {
+            if ($user->role === 'super_admin' || in_array($request->store_id, $allowedStoreIds)) {
+                $query->where('store_id', $request->store_id);
+            }
+        }
+
+        if ($request->filled('supplier_id')) {
+            $query->where('Supplier_id', $request->supplier_id);
+        }
+
+        if ($request->filled('customer_name')) {
+            $customerName = trim($request->customer_name);
+            if ($customerName !== '') {
+                $query->where('customer_name', 'like', '%' . $customerName . '%');
+            }
+        }
+
+        $query->orderBy('order_date', 'desc');
+        $orders = $query->paginate(50)->withQueryString();
+
+        if ($user->role === 'admin') {
+            $stores = $user->stores;
+            $suppliers = Supplier::whereHas('orders', function ($q) use ($allowedStoreIds) {
+                $q->whereIn('store_id', $allowedStoreIds);
+            })->orderBy('first_name')->get();
+        } else {
+            $stores = Store::orderBy('name')->get();
+            $suppliers = Supplier::orderBy('first_name')->get();
+        }
+
+        return view('admin.orders.completed', compact('orders', 'suppliers', 'stores'));
     }
 
     public function bulkStatusForm()
@@ -175,6 +230,36 @@ class OrderController extends Controller
         ]);
     }
 
+    public function swapColorSize(Request $request)
+    {
+        $user = auth()->user();
+        $query = Order::query();
+
+        if ($user->role === 'admin') {
+            $allowedStoreIds = $user->stores()->pluck('stores.id')->toArray();
+            if (!empty($allowedStoreIds)) {
+                $query->whereIn('store_id', $allowedStoreIds);
+            } else {
+                $query->where('id', 0);
+            }
+        }
+
+        $updated = 0;
+        $query->select('id', 'color', 'size')
+            ->orderBy('id')
+            ->chunkById(500, function ($orders) use (&$updated) {
+                foreach ($orders as $order) {
+                    $order->update([
+                        'color' => $order->size,
+                        'size' => $order->color,
+                    ]);
+                    $updated++;
+                }
+            });
+
+        return back()->with('success', "Swapped color and size for {$updated} orders.");
+    }
+
     /**
      * Show the form for creating a new resource.
      *
@@ -206,7 +291,9 @@ class OrderController extends Controller
             'size' => 'nullable|string',
             'main_days_allocated' => 'required|integer|min:1',
             'extra_days_allocated' => 'required|integer|min:0',
-            'image_path' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:10000',
+            'image_path' => 'nullable|array',
+            'image_path.*' => 'image|mimes:jpeg,png,jpg,gif|max:10240',
+            'compress_images' => 'nullable|boolean',
             'customer_name' => 'required|string|max:255',
             'email'         => 'nullable|email|max:255',
             'country'       => 'nullable|string|max:100',
@@ -215,12 +302,28 @@ class OrderController extends Controller
             'note'          => 'nullable|string',
         ]);
 
-        $data = $request->except('_token', 'image_path');
+        $data = $request->except('_token', 'image_path', 'compress_images', 'swap_color_size');
         $data['status'] = 'main_time';
 
+        if ($request->boolean('swap_color_size')) {
+            $originalColor = $data['color'] ?? null;
+            $data['color'] = $data['size'] ?? null;
+            $data['size'] = $originalColor;
+        }
+
+        $compress = $request->boolean('compress_images');
+        $paths = [];
+
         if ($request->hasFile('image_path')) {
-            $path = $request->file('image_path')->store('orders', 'public');
-            $data['image_path'] = $path;
+            $files = $request->file('image_path');
+            if (!is_array($files)) {
+                $files = [$files];
+            }
+            $paths = $this->storeUploadedImages($files, $compress);
+        }
+
+        if (!empty($paths)) {
+            $data['image_path'] = json_encode($paths);
         }
 
         try {
@@ -229,7 +332,7 @@ class OrderController extends Controller
             return redirect()->route('admin.orders.index')->with('success', 'Order created!');
         } catch (Exception $e) {
             DB::rollBack();
-            return back()->with('error', $e);
+            return back()->with('error', $e->getMessage());
         }
     }
 
@@ -284,7 +387,9 @@ class OrderController extends Controller
             'size' => 'nullable|string',
             'main_days_allocated' => 'required|integer|min:1',
             'extra_days_allocated' => 'required|integer|min:0',
-            'image_path' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'image_path' => 'nullable|array',
+            'image_path.*' => 'image|mimes:jpeg,png,jpg,gif|max:10240',
+            'compress_images' => 'nullable|boolean',
             'customer_name' => 'required|string|max:255',
             'email'         => 'nullable|email|max:255',
             'country'       => 'nullable|string|max:100',
@@ -293,16 +398,27 @@ class OrderController extends Controller
             'note'          => 'nullable|string',
         ]);
 
-        $data = $request->except('_token', '_method', 'image_path');
+        $data = $request->except('_token', '_method', 'image_path', 'compress_images', 'swap_color_size');
+        $compress = $request->boolean('compress_images');
 
+        if ($request->boolean('swap_color_size')) {
+            $originalColor = $data['color'] ?? null;
+            $data['color'] = $data['size'] ?? null;
+            $data['size'] = $originalColor;
+        }
+
+        $paths = [];
         if ($request->hasFile('image_path')) {
-
-            if ($order->image_path) {
-                Storage::disk('public')->delete($order->image_path);
+            $files = $request->file('image_path');
+            if (!is_array($files)) {
+                $files = [$files];
             }
+            $paths = $this->storeUploadedImages($files, $compress);
+        }
 
-            $path = $request->file('image_path')->store('orders', 'public');
-            $data['image_path'] = $path;
+        if (!empty($paths)) {
+            $this->deleteOrderImages($order);
+            $data['image_path'] = json_encode($paths);
         }
         try {
             $order->update($data);
@@ -310,7 +426,7 @@ class OrderController extends Controller
             return redirect()->route('admin.orders.index')->with('success', 'Order updated!');
         } catch (Exception $e) {
             DB::rollBack();
-            return back()->with('error', $e);
+            return back()->with('error', $e->getMessage());
         }
     }
 
@@ -331,7 +447,76 @@ class OrderController extends Controller
             return redirect()->route('admin.orders.index')->with('success', 'Order deleted!');
         } catch (Exception $e) {
             DB::rollBack();
-            return back()->with('error', $e);
+            return back()->with('error', $e->getMessage());
+        }
+    }
+
+    private function storeUploadedImages(array $files, bool $compress)
+    {
+        $paths = [];
+        foreach ($files as $file) {
+            $paths[] = $this->storeSingleImage($file, $compress);
+        }
+        return $paths;
+    }
+
+    private function storeSingleImage($file, bool $compress)
+    {
+        if (!$compress) {
+            return $file->store('orders', 'public');
+        }
+
+        if (!function_exists('imagecreatefromjpeg') || !function_exists('imagecreatefrompng')) {
+            return $file->store('orders', 'public');
+        }
+
+        $mime = $file->getMimeType();
+        $extension = strtolower($file->getClientOriginalExtension() ?: 'jpg');
+        $filename = uniqid('order_', true) . '.' . $extension;
+        $path = 'orders/' . $filename;
+
+        $contents = null;
+        if (in_array($mime, ['image/jpeg', 'image/jpg'], true)) {
+            $image = @\imagecreatefromjpeg($file->getRealPath());
+            if ($image) {
+                ob_start();
+                \imagejpeg($image, null, 75);
+                $contents = ob_get_clean();
+                \imagedestroy($image);
+            }
+        } elseif ($mime === 'image/png') {
+            $image = @\imagecreatefrompng($file->getRealPath());
+            if ($image) {
+                ob_start();
+                \imagepng($image, null, 6);
+                $contents = ob_get_clean();
+                \imagedestroy($image);
+            }
+        }
+
+        if ($contents === null) {
+            return $file->store('orders', 'public');
+        }
+
+        Storage::disk('public')->put($path, $contents);
+        return $path;
+    }
+
+    private function deleteOrderImages(Order $order)
+    {
+        $paths = [];
+        if (!empty($order->image_path)) {
+            $decoded = json_decode($order->image_path, true);
+            if (json_last_error() === JSON_ERROR_NONE && is_array($decoded)) {
+                $paths = array_merge($paths, $decoded);
+            } else {
+                $paths[] = $order->image_path;
+            }
+        }
+
+        $paths = array_unique(array_filter($paths));
+        if (!empty($paths)) {
+            Storage::disk('public')->delete($paths);
         }
     }
 }

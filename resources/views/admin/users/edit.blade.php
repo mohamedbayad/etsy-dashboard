@@ -32,7 +32,13 @@
 
                             <div class="space-y-2">
                                 <label for="password" class="text-sm font-medium text-foreground">New Password (Optional)</label>
-                                <input type="text" name="password" id="password" placeholder="Leave empty to keep current password"
+                                <input type="password" name="password" id="password" placeholder="Leave empty to keep current password"
+                                       class="flex h-12 w-full rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary">
+                            </div>
+
+                            <div class="space-y-2">
+                                <label for="password_confirmation" class="text-sm font-medium text-foreground">Confirm Password</label>
+                                <input type="password" name="password_confirmation" id="password_confirmation" placeholder="Re-enter new password"
                                        class="flex h-12 w-full rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary">
                             </div>
 

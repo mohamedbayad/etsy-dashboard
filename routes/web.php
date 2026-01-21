@@ -42,6 +42,8 @@ Route::middleware(['auth', 'role:admin,super_admin'])->prefix('admin')->name('ad
     Route::resource('suppliers', SupplierController::class);
     Route::get('orders/bulk-status', [OrderController::class, 'bulkStatusForm'])->name('orders.bulk-status');
     Route::post('orders/bulk-status', [OrderController::class, 'bulkStatusUpdate'])->name('orders.bulk-status.update');
+    Route::get('orders/completed', [OrderController::class, 'completed'])->name('orders.completed');
+    Route::post('orders/swap-color-size', [OrderController::class, 'swapColorSize'])->name('orders.swap-color-size');
     Route::resource('orders', OrderController::class);
 });
 

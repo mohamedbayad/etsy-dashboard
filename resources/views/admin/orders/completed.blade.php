@@ -1,39 +1,55 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-foreground leading-tight">
-            {{ __('My Orders') }}
-        </h2>
+        <div class="flex justify-between items-center">
+            <h2 class="font-semibold text-xl text-foreground leading-tight">
+                {{ __('Completed Orders') }}
+            </h2>
+
+            <div class="flex items-center gap-2">
+                <a href="{{ route('admin.orders.index') }}"
+                    class="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors border border-input bg-background hover:bg-accent h-10 px-4 py-2">
+                    Active Orders
+                </a>
+                <a href="{{ route('admin.orders.create') }}"
+                    class="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2">
+                    Add Order
+                </a>
+            </div>
+        </div>
     </x-slot>
 
     <div class="py-12" x-data="{ showModal: false, activeImages: [], activeIndex: 0 }">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             <div class="rounded-xl border bg-card text-card-foreground shadow">
-
                 <div class="p-6">
-                    <h3 class="text-lg font-medium text-foreground">
-                        Hello, {{ $supplierProfile->first_name }}!
-                    </h3>
-                    <p class="text-muted-foreground text-sm">
-                        Here are your currently active orders:
-                    </p>
-                </div>
 
-                <div class="p-6">
-                    <form action="{{ route('supplier.dashboard') }}" method="GET" class="mb-6 pb-6 border-b border-border">
+                    <form action="{{ route('admin.orders.completed') }}" method="GET" class="mb-6 pb-6 border-b border-border">
                         <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
 
                             <div class="space-y-2">
-                                <label for="sort" class="text-sm font-medium leading-none">
-                                    Sort by Date
+                                <label for="supplier_id" class="text-sm font-medium leading-none">
+                                    Filter by Supplier
                                 </label>
-                                <select name="sort_retard" class="flex h-10 w-full items-center justify-between rounded-md border border-input bg-transparent px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2">
-                                    <option value="">Default Priority</option>
-                                    <option value="most_retarded" class="dark:text-black" {{ request('sort_retard') == 'most_retarded' ? 'selected' : '' }}>
-                                        Orders 9dam
+                                <select id="supplier_id" name="supplier_id"
+                                    class="flex h-10 w-full items-center justify-between rounded-md border border-input bg-transparent px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2">
+                                    <option class="dark:text-black" value="">All Suppliers</option>
+                                    @foreach ($suppliers as $supplier)
+                                    <option class="dark:text-black" value="{{ $supplier->id }}" {{ request('supplier_id') == $supplier->id ? 'selected' : '' }}>
+                                        {{ $supplier->first_name }} {{ $supplier->last_name }}
                                     </option>
-                                    <option value="least_retarded" class="dark:text-black" {{ request('sort_retard') == 'least_retarded' ? 'selected' : '' }}>
-                                        Orders jdad
+                                    @endforeach
+                                </select>
+                            </div>
+
+                            <div class="space-y-2">
+                                <label for="store_id" class="text-sm font-medium leading-none">Filter by Store</label>
+                                <select id="store_id" name="store_id" class="flex h-10 w-full items-center justify-between rounded-md border border-input bg-transparent px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2">
+                                    <option class="dark:text-black" value="">All Stores</option>
+                                    @foreach ($stores as $store)
+                                    <option class="dark:text-black" value="{{ $store->id }}" {{ request('store_id') == $store->id ? 'selected' : '' }}>
+                                        {{ $store->name }}
                                     </option>
+                                    @endforeach
                                 </select>
                             </div>
 
@@ -47,11 +63,7 @@
                             <div class="space-y-2">
                                 <label for="status" class="text-sm font-medium leading-none">Status</label>
                                 <select id="status" name="status" class="flex h-10 w-full items-center justify-between rounded-md border border-input bg-transparent px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2">
-                                    <option class="dark:text-black" value="">All Statuses</option>
-                                    <option class="dark:text-black" value="completed" {{ request('status') == 'completed' ? 'selected' : '' }}>Completed</option>
-                                    <option class="dark:text-black" value="main_time" {{ request('status') == 'main_time' ? 'selected' : '' }}>Opened Orders</option>
-                                    <option class="dark:text-black" value="extra_time" {{ request('status') == 'extra_time' ? 'selected' : '' }}>Extended Orders</option>
-                                    <option class="dark:text-black" value="not_shipped" {{ request('status') == 'not_shipped' ? 'selected' : '' }}>Not Shipped</option>
+                                    <option class="dark:text-black" value="completed" selected>Completed</option>
                                 </select>
                             </div>
 
@@ -60,22 +72,20 @@
                                     class="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2">
                                     Filter
                                 </button>
-                                <a href="{{ route('admin.dashboard') }}"
+                                <a href="{{ route('admin.orders.completed') }}"
                                     class="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors border border-input bg-background hover:bg-accent h-10 px-4 py-2">
                                     Clear
                                 </a>
                             </div>
                         </div>
                     </form>
-                </div>
-
-                <div class="p-6 pt-0">
 
                     <div class="mb-3 text-sm text-muted-foreground">
                         Orders: {{ $orders->total() }}
                     </div>
                     <div class="relative w-full overflow-auto">
                         <table class="w-full caption-bottom text-sm">
+
                             <thead class="[&_tr]:border-b">
                                 <tr class="border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted">
                                     <th class="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Customer</th>
@@ -83,13 +93,17 @@
                                     <th class="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Details (Color/Size)</th>
                                     <th class="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Quantity</th>
                                     <th class="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Note</th>
+                                    <th class="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Store</th>
+                                    <th class="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Supplier</th>
                                     <th class="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Status</th>
                                     <th class="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Opened Orders</th>
                                     <th class="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Extended Orders</th>
                                     <th class="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Not Shipped Orders</th>
                                     <th class="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Order Date</th>
+                                    <th class="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Actions</th>
                                 </tr>
                             </thead>
+
                             <tbody class="[&_tr:last-child]:border-0">
                                 @forelse ($orders as $order)
                                 <tr class="border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted">
@@ -131,95 +145,58 @@
                                         {{ \Illuminate\Support\Str::limit($order->note ?? 'N/A', 40) }}
                                     </td>
 
+                                    <td class="p-4 align-middle text-muted-foreground">
+                                        {{ $order->store->name ?? 'Store SupprimǸ' }}
+                                    </td>
+
+                                    <td class="p-4 align-middle text-muted-foreground">
+                                        {{ $order->supplier->first_name ?? 'Supplier SupprimǸ' }}
+                                    </td>
+
                                     <td class="p-4 align-middle">
-                                        @if($order->status == 'main_time')
-                                        <div class="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold border-transparent bg-orange-500 text-white">
-                                            Opened Orders
-                                        </div>
-
-                                        @elseif($order->status == 'extra_time')
-                                        <div class="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold border-transparent bg-destructive text-destructive-foreground">
-                                            Extended Orders
-                                        </div>
-
-                                        @elseif($order->status == 'not_shipped')
-                                        <div class="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold border-transparent bg-red-700 text-white">
-                                            Not Shipped
-                                        </div>
-
-                                        @elseif($order->status == 'completed')
                                         <div class="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold border-transparent bg-green-600 text-white">
                                             Completed
                                         </div>
-
-                                        @else
-                                        <div class="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold border-transparent bg-muted text-muted-foreground">
-                                            {{ $order->status }}
-                                        </div>
-                                        @endif
                                     </td>
 
-
-                                    <!-- Main Time -->
                                     <td class="p-4 align-middle font-medium">
-                                        @if($order->status == 'main_time')
-                                        <div class="text-green-600 dark:text-green-400">
-                                            {{ $order->main_days_allocated - $order->days_spent_main }} Days
-                                        </div>
-                                        <div class="text-xs text-muted-foreground">
-                                            ({{ $order->days_spent_main }}/{{ $order->main_days_allocated }})
-                                        </div>
-                                        @elseif($order->status == 'extra_time' || $order->status == 'not_shipped')
-                                        <div class=" text-base text-red-600 dark:text-red-400"> ({{ $order->days_spent_main }}/{{ $order->main_days_allocated }}) <span class=" text-xs ">days</span>
-                                        </div>
-                                        @else
                                         <div class="text-muted-foreground">N/A</div>
-                                        @endif
                                     </td>
 
-                                    <!-- Extra Time -->
                                     <td class="p-4 align-middle font-medium">
-                                        @if ( $order->extra_days_allocated - $order->days_spent_extra > 0)
-                                        @if($order->status == 'extra_time')
-                                        <div class="text-red-600 dark:text-red-400">
-                                            {{ $order->extra_days_allocated - $order->days_spent_extra }} Days
-                                        </div>
-                                        <div class="text-xs text-muted-foreground">
-                                            ({{ $order->days_spent_extra }}/{{ $order->extra_days_allocated }})
-                                        </div>
-                                        @else
                                         <div class="text-muted-foreground">N/A</div>
-                                        @endif
-                                        @else
-                                        <div class=" text-base text-red-600 dark:text-red-400"> ({{ $order->extra_days_allocated }}/{{ $order->extra_days_allocated }}) <span class=" text-xs ">days</span>
-                                        </div>
-                                        @endif
                                     </td>
 
-                                    <!-- Days Retarded -->
                                     <td class="p-4 align-middle font-medium">
-                                        @if ($order->days_retarded == 0)
-                                            <div class=" text-white font-extrabold flex items-center">
-                                                N/A
-                                            </div>
-                                        @else
-                                            <div class="text-red-700 font-extrabold flex items-center">
-                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                                </svg>
-                                                {{ $order->days_retarded }} Days (Retard)
-                                            </div>
-                                        @endif
+                                        <div class="text-muted-foreground">N/A</div>
                                     </td>
 
                                     <td class="p-4 align-middle font-medium">
                                         {{ $order->order_date->format('d/m/Y') }}
                                     </td>
+
+                                    <td class="p-4 align-middle">
+                                        <div class="flex space-x-2">
+                                            <a href="{{ route('admin.orders.edit', $order->id) }}"
+                                                class="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-9 px-3">
+                                                Edit
+                                            </a>
+
+                                            <form action="{{ route('admin.orders.destroy', $order->id) }}" method="POST" onsubmit="return confirm('Are you sure ?');">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit"
+                                                    class="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-destructive text-destructive-foreground hover:bg-destructive/90 h-9 px-3">
+                                                    Delete
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </td>
                                 </tr>
                                 @empty
                                 <tr>
-                                    <td colspan="10" class="p-4 text-center text-muted-foreground">
-                                        You have no active orders at this time.
+                                    <td colspan="13" class="p-4 text-center text-muted-foreground">
+                                        No Completed Orders.
                                     </td>
                                 </tr>
                                 @endforelse
@@ -243,7 +220,7 @@
             x-transition:leave-end="opacity-0"
             class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 dark:bg-black/90 p-4 backdrop-blur-sm"
             @click.self="showModal = false">
-            <div class="relative bg-transparent max-w-5xl w-full">
+            <div class="relative bg-transparent max-w-4xl w-full flex justify-center">
 
                 <button @click="showModal = false"
                     class="absolute -top-12 right-0 text-white hover:text-gray-300 dark:hover:text-gray-400 focus:outline-none">
@@ -286,5 +263,4 @@
                 </div>
             </div>
         </div>
-    </div>
 </x-app-layout>

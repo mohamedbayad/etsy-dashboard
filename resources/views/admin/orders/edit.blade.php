@@ -112,6 +112,12 @@
                                                 class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2">
                                         </div>
 
+                                        <div class="flex items-center space-x-2 pt-2">
+                                            <input type="checkbox" name="swap_color_size" id="swap_color_size"
+                                                class="h-4 w-4 rounded border-input bg-background text-primary focus:ring-2 focus:ring-ring focus:ring-offset-2">
+                                            <label for="swap_color_size" class="text-sm text-muted-foreground">Swap Color &amp; Size</label>
+                                        </div>
+
                                         <div class="space-y-2">
                                             <label for="quantity" class="text-sm font-medium leading-none">Quantity <span class="text-red-500">*</span></label>
                                             <input type="number" name="quantity" id="quantity" required min="1"
@@ -160,24 +166,34 @@
                                         </div>
 
                                         <div class="space-y-2 md:col-span-2">
-                                            <label for="image_path" class="text-sm font-medium leading-none">Product Image (Paste Ctrl+V supported)</label>
+                                            <label for="image_path" class="text-sm font-medium leading-none">Product Images (Paste Ctrl+V supported)</label>
 
                                             <div class="relative border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-6 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition ease-in-out duration-150 text-center" id="paste_area">
 
-                                                <input id="image_path" name="image_path" type="file" accept="image/*" class="hidden" onchange="previewImage(this)">
+                                                <input id="image_path" name="image_path[]" type="file" accept="image/*" multiple class="hidden" onchange="previewImage(this)">
 
-                                                <div id="preview_container" class="{{ $order->image_path ? 'flex' : 'hidden' }} flex-col items-center">
-                                                    <img id="preview_img"
-                                                         src="{{ $order->image_path ? asset('storage/' . $order->image_path) : '#' }}"
-                                                         alt="Image Preview"
-                                                         class="max-h-64 rounded-lg shadow-md mb-3 border border-gray-200">
+                                                @php
+                                                    $decodedImages = json_decode($order->image_path ?? '', true);
+                                                    $imagePaths = (json_last_error() === JSON_ERROR_NONE && is_array($decodedImages))
+                                                        ? $decodedImages
+                                                        : ($order->image_path ? [$order->image_path] : []);
+                                                    $primaryImage = $imagePaths[0] ?? null;
+                                                @endphp
+                                                <div id="preview_container" class="{{ $primaryImage ? 'flex' : 'hidden' }} flex-col items-center">
+                                                    <div id="preview_list" class="flex flex-wrap justify-center gap-2 mb-3">
+                                                        @foreach ($imagePaths as $path)
+                                                            <img src="{{ asset('storage/' . $path) }}"
+                                                                alt="Image Preview"
+                                                                class="h-20 w-20 rounded-lg object-cover border border-gray-200">
+                                                        @endforeach
+                                                    </div>
 
                                                     <button type="button" onclick="removeImage()" class="text-xs text-red-500 hover:text-red-700 underline">
-                                                        {{ $order->image_path ? 'Replace Image' : 'Remove Image' }}
+                                                        {{ $primaryImage ? 'Replace Images' : 'Remove Images' }}
                                                     </button>
                                                 </div>
 
-                                                <div id="placeholder_text" class="{{ $order->image_path ? 'hidden' : 'block' }} cursor-pointer" onclick="document.getElementById('image_path').click()">
+                                                <div id="placeholder_text" class="{{ $primaryImage ? 'hidden' : 'block' }} cursor-pointer" onclick="document.getElementById('image_path').click()">
                                                     <svg class="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48" aria-hidden="true">
                                                         <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
                                                     </svg>
@@ -191,10 +207,16 @@
                                                         PNG, JPG, GIF up to 10MB
                                                     </p>
                                                     <p class="text-xs text-blue-500 font-bold mt-2">
-                                                        💡 Tip: Click anywhere and press Ctrl+V to paste new image
+                                                        💡 Tip: Click anywhere and press Ctrl+V to paste images
                                                     </p>
                                                 </div>
                                             </div>
+                                        </div>
+
+                                        <div class="flex items-center gap-2 md:col-span-2">
+                                            <input id="compress_images" name="compress_images" type="checkbox" value="1"
+                                                class="h-4 w-4 rounded border border-input text-primary focus:ring-2 focus:ring-ring">
+                                            <label for="compress_images" class="text-sm text-muted-foreground">Compress uploaded images</label>
                                         </div>
 
                                     </div>

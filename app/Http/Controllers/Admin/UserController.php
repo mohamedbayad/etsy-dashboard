@@ -99,7 +99,6 @@ class UserController extends Controller
 
         $request->validate([
             'email' => 'required|string|email|max:255|unique:users,email,' . $user->id,
-            'password' => ['nullable', 'confirmed', Rules\Password::defaults()],
             'role' => 'required|in:admin,supplier,super_admin',
             'name' => 'nullable|required_if:role,admin|string|max:255',
             'first_name' => 'nullable|required_if:role,supplier|string|max:255',
@@ -107,12 +106,25 @@ class UserController extends Controller
             'specialty' => 'nullable|required_if:role,supplier|string|max:255',
         ]);
 
+        if ($request->filled('password')) {
+            $request->validate([
+                'password' => ['required', 'confirmed', Rules\Password::defaults()],
+            ]);
+        }
+
         $user->update([
-            'name' => $request->name,
+            'name' => $request->role === 'supplier'
+                ? trim($request->first_name . ' ' . $request->last_name)
+                : $request->name,
             'email' => $request->email,
-            'password' => Hash::make($request->password),
             'role' => $request->role,
         ]);
+
+        if ($request->filled('password')) {
+            $user->update([
+                'password' => Hash::make($request->password),
+            ]);
+        }
 
         if ($request->role === 'admin') {
             $user->stores()->sync($request->input('stores', []));
