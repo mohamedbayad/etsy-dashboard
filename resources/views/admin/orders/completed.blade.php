@@ -133,8 +133,8 @@
                                     </td>
 
                                     <td class="p-4 align-middle font-medium">
-                                        <div>{{ $order->color ?? 'N/A' }}</div>
-                                        <div class="text-muted-foreground text-xs">{{ $order->size ?? 'N/A' }}</div>
+                                        <div>{{ $order->size ?? 'N/A' }}</div>
+                                        <div class="text-muted-foreground text-xs">{{ $order->color ?? 'N/A' }}</div>
                                     </td>
 
                                     <td class="p-4 align-middle text-muted-foreground">
