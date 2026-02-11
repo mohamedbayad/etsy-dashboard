@@ -18,7 +18,9 @@ class SupplierController extends Controller
     public function index()
     {
         $suppliers = Supplier::with('user')
-            ->withCount('orders')
+            ->withCount(['orders' => function ($query) {
+                $query->where('status', '!=', 'completed');
+            }])
             ->whereHas('user')
             ->orderBy('created_at', 'desc')
             ->get();
