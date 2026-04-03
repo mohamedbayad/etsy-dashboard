@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use App\Models\Store;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
@@ -17,30 +18,41 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // Khasn n7tarmo tartib 7it 3andna relations
-        // Nqado l-database bach t9bel nkhwiw tables bla mochkil
         DB::statement('SET FOREIGN_KEY_CHECKS=0;');
 
-        // Nkhwiw tables dyal l-users w l-orders lowlin
-        DB::table('users')->truncate();
+        DB::table('monthly_ads_entries')->truncate();
         DB::table('orders')->truncate();
+        DB::table('niches')->truncate();
+        DB::table('suppliers')->truncate();
+        DB::table('store_user')->truncate();
+        DB::table('stores')->truncate();
+        DB::table('users')->truncate();
 
-        // Hna ghadi nsaybo l-Admin dyalk
-        User::create([
+        $superAdmin = User::create([
             'name' => 'Admin',
             'email' => 'admin@example.com',
-            'password' => Hash::make('password'), // L-password howa 'password'
+            'password' => Hash::make('password'),
             'role' => 'super_admin',
         ]);
 
-        // N3ayto 3la l-Seeders b tartib
         $this->call([
             StoreSeeder::class,
             SupplierSeeder::class,
+            NicheSeeder::class,
             OrderSeeder::class,
+            MonthlyAdsEntrySeeder::class,
         ]);
 
-        // Nrj3o kolshi kif kan
+        $admin = User::create([
+            'name' => 'Operations Admin',
+            'email' => 'ops-admin@example.com',
+            'password' => Hash::make('password'),
+            'role' => 'admin',
+        ]);
+
+        $admin->stores()->sync(Store::query()->pluck('id')->all());
+        $superAdmin->stores()->sync(Store::query()->pluck('id')->all());
+
         DB::statement('SET FOREIGN_KEY_CHECKS=1;');
     }
 }

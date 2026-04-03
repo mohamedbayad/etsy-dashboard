@@ -1,40 +1,35 @@
 <x-app-layout>
     <x-slot name="header">
-        <div class="flex justify-between items-center">
-            <h2 class="font-semibold text-xl text-foreground leading-tight">
-                {{ __('Completed Orders') }}
-            </h2>
+        <div class="admin-page-header">
+            <h1 class="admin-page-title">{{ __('Completed Orders') }}</h1>
 
             <div class="flex items-center gap-2">
-                <a href="{{ route('admin.orders.index') }}"
-                    class="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors border border-input bg-background hover:bg-accent h-10 px-4 py-2">
+                <a href="{{ route('admin.orders.index') }}" class="admin-btn-secondary">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-2"><path d="m15 18-6-6 6-6"/></svg>
                     Active Orders
                 </a>
-                <a href="{{ route('admin.orders.create') }}"
-                    class="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2">
+                <a href="{{ route('admin.orders.create') }}" class="admin-btn-primary">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-2"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
                     Add Order
                 </a>
             </div>
         </div>
     </x-slot>
 
-    <div class="py-12" x-data="{ showModal: false, activeImages: [], activeIndex: 0 }">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="rounded-xl border bg-card text-card-foreground shadow">
-                <div class="p-6">
+    <div class="py-6 animate-fade-up" x-data="{ showModal: false, activeImages: [], activeIndex: 0 }">
+        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">
+            <div class="admin-panel text-card-foreground">
+                <div class="admin-panel-body">
 
-                    <form action="{{ route('admin.orders.completed') }}" method="GET" class="mb-6 pb-6 border-b border-border">
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
+                    <form action="{{ route('admin.orders.completed') }}" method="GET" class="admin-subtle-divider">
+                        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
 
                             <div class="space-y-2">
-                                <label for="supplier_id" class="text-sm font-medium leading-none">
-                                    Filter by Supplier
-                                </label>
-                                <select id="supplier_id" name="supplier_id"
-                                    class="flex h-10 w-full items-center justify-between rounded-md border border-input bg-transparent px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2">
-                                    <option class="dark:text-black" value="">All Suppliers</option>
+                                <label for="supplier_id" class="admin-label">Supplier</label>
+                                <select id="supplier_id" name="supplier_id" class="admin-input">
+                                    <option value="">All Suppliers</option>
                                     @foreach ($suppliers as $supplier)
-                                    <option class="dark:text-black" value="{{ $supplier->id }}" {{ request('supplier_id') == $supplier->id ? 'selected' : '' }}>
+                                    <option value="{{ $supplier->id }}" {{ request('supplier_id') == $supplier->id ? 'selected' : '' }}>
                                         {{ $supplier->first_name }} {{ $supplier->last_name }}
                                     </option>
                                     @endforeach
@@ -42,11 +37,11 @@
                             </div>
 
                             <div class="space-y-2">
-                                <label for="store_id" class="text-sm font-medium leading-none">Filter by Store</label>
-                                <select id="store_id" name="store_id" class="flex h-10 w-full items-center justify-between rounded-md border border-input bg-transparent px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2">
-                                    <option class="dark:text-black" value="">All Stores</option>
+                                <label for="store_id" class="admin-label">Store</label>
+                                <select id="store_id" name="store_id" class="admin-input">
+                                    <option value="">All Stores</option>
                                     @foreach ($stores as $store)
-                                    <option class="dark:text-black" value="{{ $store->id }}" {{ request('store_id') == $store->id ? 'selected' : '' }}>
+                                    <option value="{{ $store->id }}" {{ request('store_id') == $store->id ? 'selected' : '' }}>
                                         {{ $store->name }}
                                     </option>
                                     @endforeach
@@ -54,60 +49,46 @@
                             </div>
 
                             <div class="space-y-2">
-                                <label for="customer_name" class="text-sm font-medium leading-none">Customer Name</label>
+                                <label for="customer_name" class="admin-label">Customer Name</label>
                                 <input id="customer_name" name="customer_name" type="text" value="{{ request('customer_name') }}"
-                                    placeholder="Search customer"
-                                    class="flex h-10 w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2">
+                                    placeholder="Search..." class="admin-input">
                             </div>
 
-                            <div class="space-y-2">
-                                <label for="status" class="text-sm font-medium leading-none">Status</label>
-                                <select id="status" name="status" class="flex h-10 w-full items-center justify-between rounded-md border border-input bg-transparent px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2">
-                                    <option class="dark:text-black" value="completed" selected>Completed</option>
-                                </select>
-                            </div>
-
-                            <div class="flex space-x-2">
-                                <button type="submit"
-                                    class="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2">
+                            <div class="flex gap-2">
+                                <button type="submit" class="admin-btn-primary flex-1">
                                     Filter
                                 </button>
-                                <a href="{{ route('admin.orders.completed') }}"
-                                    class="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors border border-input bg-background hover:bg-accent h-10 px-4 py-2">
+                                <a href="{{ route('admin.orders.completed') }}" class="admin-btn-secondary">
                                     Clear
                                 </a>
                             </div>
                         </div>
                     </form>
 
-                    <div class="mb-3 text-sm text-muted-foreground">
-                        Orders: {{ $orders->total() }}
+                    <div class="mb-3 text-[11px] font-bold uppercase tracking-wider text-muted-foreground/60">
+                        Orders Found: <span class="text-foreground">{{ $orders->total() }}</span>
                     </div>
-                    <div class="relative w-full overflow-auto">
-                        <table class="w-full caption-bottom text-sm">
 
-                            <thead class="[&_tr]:border-b">
-                                <tr class="border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted">
-                                    <th class="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Customer</th>
-                                    <th class="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Image</th>
-                                    <th class="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Details (Color/Size)</th>
-                                    <th class="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Quantity</th>
-                                    <th class="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Note</th>
-                                    <th class="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Store</th>
-                                    <th class="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Supplier</th>
-                                    <th class="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Status</th>
-                                    <th class="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Opened Orders</th>
-                                    <th class="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Extended Orders</th>
-                                    <th class="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Not Shipped Orders</th>
-                                    <th class="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Order Date</th>
-                                    <th class="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Actions</th>
+                    <div class="admin-table-shell">
+                        <table class="admin-table">
+                            <thead class="admin-table-head">
+                                <tr class="admin-tr border-b-2">
+                                    <th class="admin-th">Customer</th>
+                                    <th class="admin-th">Product</th>
+                                    <th class="admin-th">Variation</th>
+                                    <th class="admin-th">Qty</th>
+                                    <th class="admin-th">Note</th>
+                                    <th class="admin-th">Source</th>
+                                    <th class="admin-th">Fulfillment</th>
+                                    <th class="admin-th">Status</th>
+                                    <th class="admin-th">Date</th>
+                                    <th class="admin-th">Actions</th>
                                 </tr>
                             </thead>
 
-                            <tbody class="[&_tr:last-child]:border-0">
+                            <tbody class="[&_tr:last-child]:border-0 font-medium">
                                 @forelse ($orders as $order)
-                                <tr class="border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted">
-
+                                <tr class="admin-tr">
                                     @php
                                         $decodedImages = json_decode($order->image_path ?? '', true);
                                         $imagePaths = (json_last_error() === JSON_ERROR_NONE && is_array($decodedImages))
@@ -115,79 +96,70 @@
                                             : ($order->image_path ? [$order->image_path] : []);
                                         $imagePath = $imagePaths[0] ?? null;
                                     @endphp
-                                    <td class="p-4 align-middle text-muted-foreground">
-                                        {{ $order->customer_name ?? 'N/A' }}
+                                    <td class="admin-td">
+                                        <div class="font-bold text-foreground text-sm">{{ $order->customer_name ?? 'N/A' }}</div>
                                     </td>
 
-                                    <td class="p-4 align-middle">
+                                    <td class="admin-td">
                                         @if($imagePath)
-                                        <img src="{{ asset('storage/' . $imagePath) }}"
-                                            alt="Order Image"
-                                            class="h-12 w-12 rounded-md object-cover cursor-zoom-in hover:opacity-80 transition-opacity"
-                                            @click="showModal = true; activeImages = {{ json_encode($imagePaths) }}; activeIndex = 0">
+                                        <div class="relative h-12 w-12 overflow-hidden rounded-lg ring-1 ring-border group/img">
+                                            <img src="{{ asset('storage/' . $imagePath) }}"
+                                                alt="Order Image"
+                                                class="h-full w-full object-cover cursor-zoom-in group-hover/img:scale-110 transition-transform"
+                                                @click="showModal = true; activeImages = {{ json_encode($imagePaths) }}; activeIndex = 0">
+                                        </div>
                                         @else
-                                        <div class="h-12 w-12 rounded-md bg-muted flex items-center justify-center text-xs text-muted-foreground">
-                                            No Img
+                                        <div class="h-12 w-12 rounded-lg bg-muted flex items-center justify-center text-[10px] text-muted-foreground font-bold border border-dashed border-border/60">
+                                            NO IMG
                                         </div>
                                         @endif
                                     </td>
 
-                                    <td class="p-4 align-middle font-medium">
-                                        <div>{{ $order->size ?? 'N/A' }}</div>
-                                        <div class="text-muted-foreground text-xs">{{ $order->color ?? 'N/A' }}</div>
+                                    <td class="admin-td">
+                                        <div class="text-xs font-bold">{{ $order->size ?? 'N/A' }}</div>
+                                        <div class="text-[10px] text-muted-foreground">{{ $order->color ?? 'N/A' }}</div>
                                     </td>
 
-                                    <td class="p-4 align-middle text-muted-foreground">
-                                        {{ $order->quantity ?? 'N/A' }}
+                                    <td class="admin-td text-muted-foreground font-bold">
+                                        {{ $order->quantity ?? '1' }}
                                     </td>
 
-                                    <td class="p-4 align-middle text-muted-foreground">
-                                        {{ \Illuminate\Support\Str::limit($order->note ?? 'N/A', 40) }}
-                                    </td>
-
-                                    <td class="p-4 align-middle text-muted-foreground">
-                                        {{ $order->store->name ?? 'Store SupprimǸ' }}
-                                    </td>
-
-                                    <td class="p-4 align-middle text-muted-foreground">
-                                        {{ $order->supplier->first_name ?? 'Supplier SupprimǸ' }}
-                                    </td>
-
-                                    <td class="p-4 align-middle">
-                                        <div class="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold border-transparent bg-green-600 text-white">
-                                            Completed
+                                    <td class="admin-td">
+                                        <div class="text-[10px] text-muted-foreground truncate max-w-[120px] italic">
+                                            {{ $order->note ?: 'No notes provided.' }}
                                         </div>
                                     </td>
 
-                                    <td class="p-4 align-middle font-medium">
-                                        <div class="text-muted-foreground">N/A</div>
+                                    <td class="admin-td">
+                                        <div class="text-xs font-bold text-foreground">{{ $order->store->name ?? 'Deleted' }}</div>
                                     </td>
 
-                                    <td class="p-4 align-middle font-medium">
-                                        <div class="text-muted-foreground">N/A</div>
+                                    <td class="admin-td">
+                                        <div class="text-xs font-bold text-foreground">{{ $order->supplier->first_name ?? 'Deleted' }}</div>
                                     </td>
 
-                                    <td class="p-4 align-middle font-medium">
-                                        <div class="text-muted-foreground">N/A</div>
+                                    <td class="admin-td">
+                                        <span class="admin-badge-success font-bold text-[10px]">
+                                            COMPLETED
+                                        </span>
                                     </td>
 
-                                    <td class="p-4 align-middle font-medium">
+                                    <td class="admin-td text-[10px] text-muted-foreground font-bold">
                                         {{ $order->order_date->format('d/m/Y') }}
                                     </td>
 
-                                    <td class="p-4 align-middle">
-                                        <div class="flex space-x-2">
+                                    <td class="admin-td">
+                                        <div class="flex items-center gap-1.5">
                                             <a href="{{ route('admin.orders.edit', $order->id) }}"
-                                                class="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-9 px-3">
-                                                Edit
+                                                class="admin-btn-secondary-sm h-8 w-8 p-0" title="Edit">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/><path d="m15 5 4 4"/></svg>
                                             </a>
 
-                                            <form action="{{ route('admin.orders.destroy', $order->id) }}" method="POST" onsubmit="return confirm('Are you sure ?');">
+                                            <form action="{{ route('admin.orders.destroy', $order->id) }}" method="POST" onsubmit="event.preventDefault(); window.confirmAdminAction(this, 'Delete Order', 'Are you sure you want to permanently delete this order?', 'danger');" class="inline">
                                                 @csrf
                                                 @method('DELETE')
-                                                <button type="submit"
-                                                    class="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-destructive text-destructive-foreground hover:bg-destructive/90 h-9 px-3">
-                                                    Delete
+                                                <button type="submit" class="admin-btn-danger-sm h-8 w-8 p-0" title="Delete">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/></svg>
                                                 </button>
                                             </form>
                                         </div>
@@ -195,8 +167,8 @@
                                 </tr>
                                 @empty
                                 <tr>
-                                    <td colspan="13" class="p-4 text-center text-muted-foreground">
-                                        No Completed Orders.
+                                    <td colspan="10" class="p-12 text-center text-muted-foreground italic">
+                                        No completed orders found matching your criteria.
                                     </td>
                                 </tr>
                                 @endforelse
@@ -210,57 +182,69 @@
             </div>
         </div>
 
-        <div x-show="showModal"
-            style="display: none;"
-            x-transition:enter="transition ease-out duration-300"
-            x-transition:enter-start="opacity-0"
-            x-transition:enter-end="opacity-100"
-            x-transition:leave="transition ease-in duration-200"
-            x-transition:leave-start="opacity-100"
-            x-transition:leave-end="opacity-0"
-            class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 dark:bg-black/90 p-4 backdrop-blur-sm"
-            @click.self="showModal = false">
-            <div class="relative bg-transparent max-w-4xl w-full flex justify-center">
+        <!-- Premium Image Modal -->
+        <div x-cloak x-show="showModal"
+             x-transition:enter="transition ease-out duration-300"
+             x-transition:enter-start="opacity-0"
+             x-transition:enter-end="opacity-100"
+             x-transition:leave="transition ease-in duration-200"
+             x-transition:leave-start="opacity-100"
+             x-transition:leave-end="opacity-0"
+             class="fixed inset-0 z-50 flex items-center justify-center bg-black/95 p-4 backdrop-blur-md"
+             @keydown.escape.window="showModal = false"
+             @click.self="showModal = false">
 
-                <button @click="showModal = false"
-                    class="absolute -top-12 right-0 text-white hover:text-gray-300 dark:hover:text-gray-400 focus:outline-none">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <line x1="18" y1="6" x2="6" y2="18"></line>
-                        <line x1="6" y1="6" x2="18" y2="18"></line>
-                    </svg>
-                </button>
+            <button @click="showModal = false"
+                class="absolute top-6 right-6 text-white/70 hover:text-white transition-colors focus:outline-none">
+                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+            </button>
 
-                <div class="flex gap-4">
-                    <div class="flex flex-col gap-2 max-h-[80vh] overflow-auto pr-2">
-                        <template x-for="(img, idx) in activeImages" :key="idx">
-                            <button type="button" @click="activeIndex = idx" class="rounded-md focus:outline-none focus:ring-2 focus:ring-ring">
-                                <img :src="`{{ asset('storage') }}/` + img"
-                                    class="h-16 w-16 rounded-md object-cover border border-border"
-                                    :class="activeIndex === idx ? 'ring-2 ring-white' : 'opacity-80'">
-                            </button>
-                        </template>
-                    </div>
-                    <div class="relative flex-1 flex items-center justify-center">
-                        <button type="button"
-                            class="absolute left-2 top-1/2 -translate-y-1/2 rounded-full bg-white/90 p-2 text-black shadow"
-                            x-show="activeImages.length > 1"
-                            @click="activeIndex = (activeIndex - 1 + activeImages.length) % activeImages.length">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
-                            </svg>
+            <div class="relative max-w-5xl w-full flex flex-col md:flex-row gap-6">
+                <!-- Sidebar Thumbnails -->
+                <div class="flex md:flex-col flex-row gap-3 max-h-[70vh] overflow-auto pr-2 custom-scrollbar order-2 md:order-1">
+                    <template x-for="(img, idx) in activeImages" :key="idx">
+                        <button type="button" @click="activeIndex = idx"
+                            class="relative rounded-xl overflow-hidden focus:outline-none group/thumb flex-shrink-0"
+                            :class="activeIndex === idx ? 'ring-2 ring-primary ring-offset-2 ring-offset-black' : 'opacity-40 hover:opacity-100 transition-opacity'">
+                            <img :src="`{{ asset('storage') }}/` + img"
+                                class="h-16 w-16 object-cover border border-white/10 group-hover/thumb:scale-110 transition-transform">
                         </button>
+                    </template>
+                </div>
+
+                <!-- Main Display Area -->
+                <div class="relative flex-1 flex items-center justify-center order-1 md:order-2">
+                    <button type="button"
+                        class="absolute left-4 top-1/2 -translate-y-1/2 rounded-full bg-white/10 hover:bg-white/20 p-3 text-white backdrop-blur shadow-xl transition-all z-10"
+                        x-show="activeImages.length > 1"
+                        @click="activeIndex = (activeIndex - 1 + activeImages.length) % activeImages.length">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
+                        </svg>
+                    </button>
+
+                    <div class="relative group/main">
                         <img :src="activeImages.length ? `{{ asset('storage') }}/` + activeImages[activeIndex] : ''"
-                            class="max-h-[85vh] w-auto rounded-lg shadow-2xl border border-border object-contain">
-                        <button type="button"
-                            class="absolute right-2 top-1/2 -translate-y-1/2 rounded-full bg-white/90 p-2 text-black shadow"
-                            x-show="activeImages.length > 1"
-                            @click="activeIndex = (activeIndex + 1) % activeImages.length">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-                            </svg>
-                        </button>
+                            class="max-h-[80vh] w-auto rounded-2xl shadow-[0_0_50px_-12px_rgba(0,0,0,0.5)] border border-white/10 object-contain ring-1 ring-white/20">
+
+                        <div class="absolute bottom-4 left-1/2 -translate-x-1/2 px-4 py-1.5 bg-black/60 backdrop-blur rounded-full text-[10px] font-bold text-white uppercase tracking-widest border border-white/10">
+                            Image <span x-text="activeIndex + 1"></span> of <span x-text="activeImages.length"></span>
+                        </div>
                     </div>
+
+                    <button type="button"
+                        class="absolute right-4 top-1/2 -translate-y-1/2 rounded-full bg-white/10 hover:bg-white/20 p-3 text-white backdrop-blur shadow-xl transition-all z-10"
+                        x-show="activeImages.length > 1"
+                        @click="activeIndex = (activeIndex + 1) % activeImages.length">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
+                        </svg>
+                    </button>
                 </div>
             </div>
         </div>
+    </div>
 </x-app-layout>

@@ -1,99 +1,88 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-foreground leading-tight">
-            {{ __('My Orders') }}
-        </h2>
+        <div class="admin-page-header">
+            <div>
+                <h1 class="admin-page-title">{{ __('Supplier Portal') }}</h1>
+                <p class="text-xs text-muted-foreground mt-1 font-medium italic">Welcome back, {{ $supplierProfile->first_name }}! Managing your active shipments.</p>
+            </div>
+            <div class="flex items-center gap-3">
+                <div class="px-3 py-1 rounded-full bg-primary/10 border border-primary/20 text-[10px] font-bold text-primary uppercase tracking-widest whitespace-nowrap">
+                    {{ $supplierProfile->specialty ?: 'General Merchant' }}
+                </div>
+            </div>
+        </div>
     </x-slot>
 
-    <div class="py-12" x-data="{ showModal: false, activeImages: [], activeIndex: 0 }">
+    <div class="py-6" x-data="{ showModal: false, activeImages: [], activeIndex: 0 }">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="rounded-xl border bg-card text-card-foreground shadow">
-
-                <div class="p-6">
-                    <h3 class="text-lg font-medium text-foreground">
-                        Hello, {{ $supplierProfile->first_name }}!
-                    </h3>
-                    <p class="text-muted-foreground text-sm">
-                        Here are your currently active orders:
-                    </p>
-                </div>
-
-                <div class="p-6">
-                    <form action="{{ route('supplier.dashboard') }}" method="GET" class="mb-6 pb-6 border-b border-border">
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
+            <div class="admin-panel animate-fade-up">
+                <div class="admin-panel-body">
+                    <form action="{{ route('supplier.dashboard') }}" method="GET" class="admin-subtle-divider">
+                        <div class="grid grid-cols-1 md:grid-cols-4 gap-5 items-end">
+                            <div class="space-y-2">
+                                <label for="customer_name" class="admin-label">Customer Search</label>
+                                <div class="relative">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground/60" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+                                    <input id="customer_name" name="customer_name" type="text" value="{{ request('customer_name') }}"
+                                        placeholder="Name or ID..."
+                                        class="admin-input pl-9">
+                                </div>
+                            </div>
 
                             <div class="space-y-2">
-                                <label for="sort" class="text-sm font-medium leading-none">
-                                    Sort by Date
-                                </label>
-                                <select name="sort_retard" class="flex h-10 w-full items-center justify-between rounded-md border border-input bg-transparent px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2">
+                                <label for="status" class="admin-label">Status</label>
+                                <select id="status" name="status" class="admin-input">
+                                    <option value="">All Statuses</option>
+                                    <option value="completed" {{ request('status') == 'completed' ? 'selected' : '' }}>Completed</option>
+                                    <option value="main_time" {{ request('status') == 'main_time' ? 'selected' : '' }}>Opened Orders</option>
+                                    <option value="extra_time" {{ request('status') == 'extra_time' ? 'selected' : '' }}>Extended Orders</option>
+                                    <option value="not_shipped" {{ request('status') == 'not_shipped' ? 'selected' : '' }}>Not Shipped</option>
+                                </select>
+                            </div>
+
+                            <div class="space-y-2">
+                                <label for="sort_retard" class="admin-label">Priority Sort</label>
+                                <select id="sort_retard" name="sort_retard" class="admin-input">
                                     <option value="">Default Priority</option>
-                                    <option value="most_retarded" class="dark:text-black" {{ request('sort_retard') == 'most_retarded' ? 'selected' : '' }}>
-                                        Orders 9dam
-                                    </option>
-                                    <option value="least_retarded" class="dark:text-black" {{ request('sort_retard') == 'least_retarded' ? 'selected' : '' }}>
-                                        Orders jdad
-                                    </option>
+                                    <option value="most_retarded" {{ request('sort_retard') == 'most_retarded' ? 'selected' : '' }}>Oldest / Overdue</option>
+                                    <option value="least_retarded" {{ request('sort_retard') == 'least_retarded' ? 'selected' : '' }}>Newest Orders</option>
                                 </select>
                             </div>
 
-                            <div class="space-y-2">
-                                <label for="customer_name" class="text-sm font-medium leading-none">Customer Name</label>
-                                <input id="customer_name" name="customer_name" type="text" value="{{ request('customer_name') }}"
-                                    placeholder="Search customer"
-                                    class="flex h-10 w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2">
-                            </div>
-
-                            <div class="space-y-2">
-                                <label for="status" class="text-sm font-medium leading-none">Status</label>
-                                <select id="status" name="status" class="flex h-10 w-full items-center justify-between rounded-md border border-input bg-transparent px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2">
-                                    <option class="dark:text-black" value="">All Statuses</option>
-                                    <option class="dark:text-black" value="completed" {{ request('status') == 'completed' ? 'selected' : '' }}>Completed</option>
-                                    <option class="dark:text-black" value="main_time" {{ request('status') == 'main_time' ? 'selected' : '' }}>Opened Orders</option>
-                                    <option class="dark:text-black" value="extra_time" {{ request('status') == 'extra_time' ? 'selected' : '' }}>Extended Orders</option>
-                                    <option class="dark:text-black" value="not_shipped" {{ request('status') == 'not_shipped' ? 'selected' : '' }}>Not Shipped</option>
-                                </select>
-                            </div>
-
-                            <div class="flex space-x-2">
-                                <button type="submit"
-                                    class="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2">
+                            <div class="flex items-center gap-2">
+                                <button type="submit" class="admin-btn-primary flex-1">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
                                     Filter
                                 </button>
-                                <a href="{{ route('admin.dashboard') }}"
-                                    class="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors border border-input bg-background hover:bg-accent h-10 px-4 py-2">
-                                    Clear
+                                <a href="{{ route('supplier.dashboard') }}" class="admin-btn-secondary" title="Clear Filters">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
                                 </a>
                             </div>
                         </div>
                     </form>
-                </div>
 
-                <div class="p-6 pt-0">
-
-                    <div class="mb-3 text-sm text-muted-foreground">
-                        Orders: {{ $orders->total() }}
+                    <div class="mb-4 flex items-center justify-between">
+                        <div class="text-sm font-semibold text-muted-foreground/80">
+                            Found <span class="text-foreground">{{ $orders->total() }}</span> active orders
+                        </div>
                     </div>
-                    <div class="relative w-full overflow-auto">
-                        <table class="w-full caption-bottom text-sm">
-                            <thead class="[&_tr]:border-b">
-                                <tr class="border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted">
-                                    <th class="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Customer</th>
-                                    <th class="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Image</th>
-                                    <th class="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Details (Color/Size)</th>
-                                    <th class="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Quantity</th>
-                                    <th class="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Note</th>
-                                    <th class="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Status</th>
-                                    <th class="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Opened Orders</th>
-                                    <th class="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Extended Orders</th>
-                                    <th class="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Not Shipped Orders</th>
-                                    <th class="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Order Date</th>
+
+                    <div class="admin-table-shell">
+                        <table class="admin-table">
+                            <thead class="admin-table-head">
+                                <tr class="admin-tr">
+                                    <th class="admin-th">Customer</th>
+                                    <th class="admin-th">Product</th>
+                                    <th class="admin-th">Details</th>
+                                    <th class="admin-th">Status</th>
+                                    <th class="admin-th">Timing</th>
+                                    <th class="admin-th">Retard</th>
+                                    <th class="admin-th">Order Date</th>
                                 </tr>
                             </thead>
                             <tbody class="[&_tr:last-child]:border-0">
                                 @forelse ($orders as $order)
-                                <tr class="border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted">
-
+                                <tr class="admin-tr group">
                                     @php
                                         $decodedImages = json_decode($order->image_path ?? '', true);
                                         $imagePaths = (json_last_error() === JSON_ERROR_NONE && is_array($decodedImages))
@@ -101,189 +90,175 @@
                                             : ($order->image_path ? [$order->image_path] : []);
                                         $imagePath = $imagePaths[0] ?? null;
                                     @endphp
-                                    <td class="p-4 align-middle text-muted-foreground">
-                                        {{ $order->customer_name ?? 'N/A' }}
+                                    <td class="admin-td">
+                                        <div class="font-bold text-foreground text-sm">{{ $order->customer_name ?? 'N/A' }}</div>
+                                        <div class="text-[10px] uppercase tracking-wider text-muted-foreground font-medium">ID: #{{ $order->id }}</div>
                                     </td>
 
-                                    <td class="p-4 align-middle">
+                                    <td class="admin-td">
                                         @if($imagePath)
-                                        <img src="{{ asset('storage/' . $imagePath) }}"
-                                            alt="Order Image"
-                                            class="h-12 w-12 rounded-md object-cover cursor-zoom-in hover:opacity-80 transition-opacity"
-                                            @click="showModal = true; activeImages = {{ json_encode($imagePaths) }}; activeIndex = 0">
+                                        <div class="group relative h-12 w-12 cursor-zoom-in" @click="showModal = true; activeImages = {{ json_encode($imagePaths) }}; activeIndex = 0">
+                                            <img src="{{ asset('storage/' . $imagePath) }}"
+                                                alt="Order Image"
+                                                class="h-12 w-12 rounded-lg object-cover ring-1 ring-border group-hover:opacity-80 transition-all group-hover:scale-105">
+                                            <div class="absolute inset-0 flex items-center justify-center bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" x2="16.65" y1="21" y2="16.65"/><line x1="11" x2="11" y1="8" y2="14"/><line x1="8" x2="14" y1="11" y2="11"/></svg>
+                                            </div>
+                                        </div>
                                         @else
-                                        <div class="h-12 w-12 rounded-md bg-muted flex items-center justify-center text-xs text-muted-foreground">
-                                            No Img
+                                        <div class="h-12 w-12 rounded-lg bg-muted flex items-center justify-center text-muted-foreground/50 border border-dashed border-border text-[10px] font-bold">
+                                            NO IMG
                                         </div>
                                         @endif
                                     </td>
 
-                                    <td class="p-4 align-middle font-medium">
-                                        <div>{{ $order->size ?? 'N/A' }}</div>
-                                        <div class="text-muted-foreground text-xs">{{ $order->color ?? 'N/A' }}</div>
-                                    </td>
-
-                                    <td class="p-4 align-middle text-muted-foreground">
-                                        {{ $order->quantity ?? 'N/A' }}
-                                    </td>
-
-                                    <td class="p-4 align-middle text-muted-foreground">
-                                        {{ \Illuminate\Support\Str::limit($order->note ?? 'N/A', 40) }}
-                                    </td>
-
-                                    <td class="p-4 align-middle">
-                                        @if($order->status == 'main_time')
-                                        <div class="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold border-transparent bg-orange-500 text-white">
-                                            Opened Orders
+                                    <td class="admin-td">
+                                        <div class="flex flex-col">
+                                            <span class="font-bold text-foreground text-xs">{{ $order->quantity ?? '0' }} units</span>
+                                            <span class="text-[11px] text-muted-foreground font-medium truncate max-w-[150px] mt-0.5">
+                                                {{ $order->size ?: 'No Size' }} • {{ $order->color ?: 'No Color' }}
+                                            </span>
+                                            @if($order->note)
+                                                <span class="text-[10px] italic text-primary mt-1 border-l-2 border-primary/30 pl-1.5 line-clamp-1" title="{{ $order->note }}">
+                                                    Note: {{ \Illuminate\Support\Str::limit($order->note, 30) }}
+                                                </span>
+                                            @endif
                                         </div>
+                                    </td>
 
+                                    <td class="admin-td">
+                                        @if($order->status == 'main_time')
+                                            <span class="admin-badge-warning shadow-sm">Opened</span>
                                         @elseif($order->status == 'extra_time')
-                                        <div class="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold border-transparent bg-destructive text-destructive-foreground">
-                                            Extended Orders
-                                        </div>
-
+                                            <span class="admin-badge-danger shadow-sm">Extended</span>
                                         @elseif($order->status == 'not_shipped')
-                                        <div class="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold border-transparent bg-red-700 text-white">
-                                            Not Shipped
-                                        </div>
-
+                                            <span class="admin-badge-danger bg-red-600/10 text-red-600 border-red-600/20 shadow-sm">Not Shipped</span>
                                         @elseif($order->status == 'completed')
-                                        <div class="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold border-transparent bg-green-600 text-white">
-                                            Completed
-                                        </div>
-
+                                            <span class="admin-badge-success shadow-sm">Completed</span>
                                         @else
-                                        <div class="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold border-transparent bg-muted text-muted-foreground">
-                                            {{ $order->status }}
-                                        </div>
+                                            <span class="admin-badge-muted">{{ $order->status }}</span>
                                         @endif
                                     </td>
 
-
-                                    <!-- Main Time -->
-                                    <td class="p-4 align-middle font-medium">
+                                    <td class="admin-td">
                                         @if($order->status == 'main_time')
-                                        <div class="text-green-600 dark:text-green-400">
-                                            {{ $order->main_days_allocated - $order->days_spent_main }} Days
-                                        </div>
-                                        <div class="text-xs text-muted-foreground">
-                                            ({{ $order->days_spent_main }}/{{ $order->main_days_allocated }})
-                                        </div>
-                                        @elseif($order->status == 'extra_time' || $order->status == 'not_shipped')
-                                        <div class=" text-base text-red-600 dark:text-red-400"> ({{ $order->days_spent_main }}/{{ $order->main_days_allocated }}) <span class=" text-xs ">days</span>
-                                        </div>
-                                        @else
-                                        <div class="text-muted-foreground">N/A</div>
-                                        @endif
-                                    </td>
-
-                                    <!-- Extra Time -->
-                                    <td class="p-4 align-middle font-medium">
-                                        @if ( $order->extra_days_allocated - $order->days_spent_extra > 0)
-                                        @if($order->status == 'extra_time')
-                                        <div class="text-red-600 dark:text-red-400">
-                                            {{ $order->extra_days_allocated - $order->days_spent_extra }} Days
-                                        </div>
-                                        <div class="text-xs text-muted-foreground">
-                                            ({{ $order->days_spent_extra }}/{{ $order->extra_days_allocated }})
-                                        </div>
-                                        @else
-                                        <div class="text-muted-foreground">N/A</div>
-                                        @endif
-                                        @else
-                                        <div class=" text-base text-red-600 dark:text-red-400"> ({{ $order->extra_days_allocated }}/{{ $order->extra_days_allocated }}) <span class=" text-xs ">days</span>
-                                        </div>
-                                        @endif
-                                    </td>
-
-                                    <!-- Days Retarded -->
-                                    <td class="p-4 align-middle font-medium">
-                                        @if ($order->days_retarded == 0)
-                                            <div class=" text-white font-extrabold flex items-center">
-                                                N/A
+                                            <div class="flex items-center gap-1.5 font-bold text-green-600 dark:text-green-400">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                                                {{ $order->main_days_allocated - $order->days_spent_main }}d Left
+                                            </div>
+                                            <div class="text-[10px] text-muted-foreground mt-0.5 uppercase tracking-tighter">
+                                                {{ $order->days_spent_main }}/{{ $order->main_days_allocated }}d Use
+                                            </div>
+                                        @elseif($order->status == 'extra_time')
+                                            <div class="flex items-center gap-1.5 font-bold text-destructive">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                                                {{ $order->extra_days_allocated - $order->days_spent_extra }}d Left
+                                            </div>
+                                            <div class="text-[10px] text-muted-foreground mt-0.5 uppercase tracking-tighter">
+                                                {{ $order->days_spent_extra }}/{{ $order->extra_days_allocated }}d Extra
                                             </div>
                                         @else
-                                            <div class="text-red-700 font-extrabold flex items-center">
-                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                                </svg>
-                                                {{ $order->days_retarded }} Days (Retard)
-                                            </div>
+                                            <div class="text-muted-foreground/40 font-bold italic text-xs">Finalized</div>
                                         @endif
                                     </td>
 
-                                    <td class="p-4 align-middle font-medium">
-                                        {{ $order->order_date->format('d/m/Y') }}
+                                    <td class="admin-td">
+                                        @if ($order->days_retarded > 0)
+                                            <div class="flex items-center gap-1.5 font-bold text-red-600 bg-red-600/5 px-2 py-1 rounded-lg border border-red-600/20 ring-4 ring-red-600/5 animate-pulse">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                                                {{ $order->days_retarded }}d Retard
+                                            </div>
+                                        @else
+                                            <div class="text-muted-foreground/30 font-bold italic text-xs">ON TIME</div>
+                                        @endif
+                                    </td>
+
+                                    <td class="admin-td font-medium text-muted-foreground text-xs">
+                                        {{ $order->order_date->format('d M, Y') }}
                                     </td>
                                 </tr>
                                 @empty
                                 <tr>
-                                    <td colspan="10" class="p-4 text-center text-muted-foreground">
-                                        You have no active orders at this time.
+                                    <td colspan="7" class="p-16 text-center text-muted-foreground italic bg-muted/10">
+                                       <div class="flex flex-col items-center gap-2">
+                                           <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="opacity-10 mb-2"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
+                                           No active orders assigned to you currently.
+                                       </div>
                                     </td>
                                 </tr>
                                 @endforelse
                             </tbody>
                         </table>
                     </div>
-                    <div class="mt-4">
+                    <div class="mt-6">
                         {{ $orders->links() }}
                     </div>
                 </div>
             </div>
         </div>
+    </div>
 
-        <div x-show="showModal"
-            style="display: none;"
-            x-transition:enter="transition ease-out duration-300"
-            x-transition:enter-start="opacity-0"
-            x-transition:enter-end="opacity-100"
-            x-transition:leave="transition ease-in duration-200"
-            x-transition:leave-start="opacity-100"
-            x-transition:leave-end="opacity-0"
-            class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 dark:bg-black/90 p-4 backdrop-blur-sm"
-            @click.self="showModal = false">
-            <div class="relative bg-transparent max-w-5xl w-full">
+    <!-- Image Preview Modal -->
+    <div x-cloak x-show="showModal"
+         x-transition:enter="transition ease-out duration-300"
+         x-transition:enter-start="opacity-0"
+         x-transition:enter-end="opacity-100"
+         x-transition:leave="transition ease-in duration-200"
+         x-transition:leave-start="opacity-100"
+         x-transition:leave-end="opacity-0"
+         class="fixed inset-0 z-50 flex items-center justify-center bg-black/90 p-4 backdrop-blur-md"
+         @keydown.escape.window="showModal = false"
+         @click.self="showModal = false">
 
-                <button @click="showModal = false"
-                    class="absolute -top-12 right-0 text-white hover:text-gray-300 dark:hover:text-gray-400 focus:outline-none">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <line x1="18" y1="6" x2="6" y2="18"></line>
-                        <line x1="6" y1="6" x2="18" y2="18"></line>
+        <button @click="showModal = false"
+            class="absolute top-6 right-6 text-white/70 hover:text-white transition-colors focus:outline-none">
+            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+        </button>
+
+        <div class="relative max-w-5xl w-full flex flex-col md:flex-row gap-6">
+            <!-- Sidebar Thumbnails -->
+            <div class="flex md:flex-col flex-row gap-3 max-h-[70vh] overflow-auto pr-2 custom-scrollbar order-2 md:order-1">
+                <template x-for="(img, idx) in activeImages" :key="idx">
+                    <button type="button" @click="activeIndex = idx"
+                        class="relative rounded-xl overflow-hidden focus:outline-none group/thumb flex-shrink-0"
+                        :class="activeIndex === idx ? 'ring-2 ring-primary ring-offset-2 ring-offset-black' : 'opacity-40 hover:opacity-100 transition-opacity'">
+                        <img :src="`{{ asset('storage') }}/` + img"
+                            class="h-16 w-16 object-cover border border-white/10 group-hover/thumb:scale-110 transition-transform">
+                    </button>
+                </template>
+            </div>
+
+            <!-- Main Display Area -->
+            <div class="relative flex-1 flex items-center justify-center order-1 md:order-2">
+                <button type="button"
+                    class="absolute left-4 top-1/2 -translate-y-1/2 rounded-full bg-white/10 hover:bg-white/20 p-3 text-white backdrop-blur shadow-xl transition-all z-10"
+                    x-show="activeImages.length > 1"
+                    @click="activeIndex = (activeIndex - 1 + activeImages.length) % activeImages.length">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
                     </svg>
                 </button>
 
-                <div class="flex gap-4">
-                    <div class="flex flex-col gap-2 max-h-[80vh] overflow-auto pr-2">
-                        <template x-for="(img, idx) in activeImages" :key="idx">
-                            <button type="button" @click="activeIndex = idx" class="rounded-md focus:outline-none focus:ring-2 focus:ring-ring">
-                                <img :src="`{{ asset('storage') }}/` + img"
-                                    class="h-16 w-16 rounded-md object-cover border border-border"
-                                    :class="activeIndex === idx ? 'ring-2 ring-white' : 'opacity-80'">
-                            </button>
-                        </template>
-                    </div>
-                    <div class="relative flex-1 flex items-center justify-center">
-                        <button type="button"
-                            class="absolute left-2 top-1/2 -translate-y-1/2 rounded-full bg-white/90 p-2 text-black shadow"
-                            x-show="activeImages.length > 1"
-                            @click="activeIndex = (activeIndex - 1 + activeImages.length) % activeImages.length">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
-                            </svg>
-                        </button>
-                        <img :src="activeImages.length ? `{{ asset('storage') }}/` + activeImages[activeIndex] : ''"
-                            class="max-h-[85vh] w-auto rounded-lg shadow-2xl border border-border object-contain">
-                        <button type="button"
-                            class="absolute right-2 top-1/2 -translate-y-1/2 rounded-full bg-white/90 p-2 text-black shadow"
-                            x-show="activeImages.length > 1"
-                            @click="activeIndex = (activeIndex + 1) % activeImages.length">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-                            </svg>
-                        </button>
+                <div class="relative group/main">
+                    <img :src="activeImages.length ? `{{ asset('storage') }}/` + activeImages[activeIndex] : ''"
+                        class="max-h-[80vh] w-auto rounded-2xl shadow-[0_0_50px_-12px_rgba(0,0,0,0.5)] border border-white/10 object-contain ring-1 ring-white/20">
+
+                    <div class="absolute bottom-4 left-1/2 -translate-x-1/2 px-4 py-1.5 bg-black/60 backdrop-blur rounded-full text-[10px] font-bold text-white uppercase tracking-widest border border-white/10">
+                        Image <span x-text="activeIndex + 1"></span> of <span x-text="activeImages.length"></span>
                     </div>
                 </div>
+
+                <button type="button"
+                    class="absolute right-4 top-1/2 -translate-y-1/2 rounded-full bg-white/10 hover:bg-white/20 p-3 text-white backdrop-blur shadow-xl transition-all z-10"
+                    x-show="activeImages.length > 1"
+                    @click="activeIndex = (activeIndex + 1) % activeImages.length">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
+                    </svg>
+                </button>
             </div>
         </div>
     </div>

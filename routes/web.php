@@ -8,6 +8,8 @@ use App\Http\Controllers\Admin\StoreController;
 use App\Http\Controllers\Admin\SupplierController;
 use App\Http\Controllers\Admin\OrderController;
 use App\Http\Controllers\Admin\UserController;
+use App\Http\Controllers\Admin\NicheController;
+use App\Http\Controllers\Admin\CalculationController;
 
 // Import Controller dyal Supplier
 use App\Http\Controllers\Supplier\SupplierDashboardController;
@@ -40,6 +42,10 @@ Route::middleware(['auth', 'role:admin,super_admin'])->prefix('admin')->name('ad
     Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
     Route::resource('stores', StoreController::class);
     Route::resource('suppliers', SupplierController::class);
+    Route::resource('niches', NicheController::class)->except(['show']);
+    Route::post('niches/{niche}/test-connection', [NicheController::class, 'testConnection'])->name('niches.test-connection');
+    Route::get('calculations', [CalculationController::class, 'index'])->name('calculations.index');
+    Route::post('calculations/ads', [CalculationController::class, 'storeAdsEntry'])->name('calculations.ads.store');
     Route::get('orders/bulk-status', [OrderController::class, 'bulkStatusForm'])->name('orders.bulk-status');
     Route::post('orders/bulk-status', [OrderController::class, 'bulkStatusUpdate'])->name('orders.bulk-status.update');
     Route::get('orders/completed', [OrderController::class, 'completed'])->name('orders.completed');

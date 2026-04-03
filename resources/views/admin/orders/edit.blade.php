@@ -5,10 +5,10 @@
         </h2>
     </x-slot>
 
-    <div class="py-12">
+    <div class="py-6">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="rounded-xl border bg-card text-card-foreground shadow">
-                <div class="p-6">
+            <div class="admin-panel">
+                <div class="admin-panel-body">
 
                     <form action="{{ route('admin.orders.update', $order->id) }}" method="POST" enctype="multipart/form-data">
                         @csrf
@@ -17,7 +17,7 @@
                         <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
 
                             <div class="space-y-6">
-                                <div class="bg-muted/40 border rounded-lg p-6">
+                                <div class="rounded-xl border border-border/60 bg-muted/25 p-6">
                                     <h3 class="text-lg font-semibold mb-4 flex items-center gap-2">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-primary">
                                             <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" />
@@ -28,38 +28,38 @@
 
                                     <div class="space-y-4">
                                         <div class="space-y-2">
-                                            <label for="customer_name" class="text-sm font-medium leading-none">Customer Name <span class="text-red-500">*</span></label>
+                                            <label for="customer_name" class="admin-label">Customer Name <span class="text-red-500">*</span></label>
                                             <input type="text" id="customer_name" name="customer_name" required
                                                 value="{{ old('customer_name', $order->customer_name) }}"
-                                                class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2">
-                                            @error('customer_name') <p class="text-red-500 text-xs">{{ $message }}</p> @enderror
+                                                class="admin-input">
+                                            @error('customer_name') <p class="text-destructive text-xs mt-1">{{ $message }}</p> @enderror
                                         </div>
 
                                         <div class="space-y-2">
-                                            <label for="email" class="text-sm font-medium leading-none">Email</label>
+                                            <label for="email" class="admin-label">Email</label>
                                             <input type="email" id="email" name="email"
                                                 value="{{ old('email', $order->email) }}"
-                                                class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2">
+                                                class="admin-input">
                                         </div>
 
                                         <div class="space-y-2">
-                                            <label for="country" class="text-sm font-medium leading-none">Country</label>
+                                            <label for="country" class="admin-label">Country</label>
                                             <input type="text" id="country" name="country"
                                                 value="{{ old('country', $order->country) }}"
-                                                class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2">
+                                                class="admin-input">
                                         </div>
 
                                         <div class="space-y-2 pt-2">
-                                            <label for="note" class="text-sm font-medium leading-none">Note / Instructions</label>
+                                            <label for="note" class="admin-label">Note / Instructions</label>
                                             <textarea id="note" name="note" rows="4"
-                                                class="flex w-full rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2">{{ old('note', $order->note) }}</textarea>
+                                                class="admin-input">{{ old('note', $order->note) }}</textarea>
                                         </div>
                                     </div>
                                 </div>
                             </div>
 
                             <div class="space-y-6">
-                                <div class="bg-muted/40 border rounded-lg p-6">
+                                <div class="rounded-xl border border-border/60 bg-muted/25 p-6">
                                     <h3 class="text-lg font-semibold mb-4 flex items-center gap-2">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-primary">
                                             <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z" />
@@ -72,9 +72,9 @@
                                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
 
                                         <div class="space-y-2">
-                                            <label for="store_id" class="text-sm font-medium leading-none">Store <span class="text-red-500">*</span></label>
+                                            <label for="store_id" class="admin-label">Store <span class="text-red-500">*</span></label>
                                             <select id="store_id" name="store_id" required
-                                                class="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2">
+                                                class="admin-input">
                                                 <option value="">Select Store...</option>
                                                 @foreach ($stores as $store)
                                                 <option value="{{ $store->id }}"
@@ -86,9 +86,9 @@
                                         </div>
 
                                         <div class="space-y-2 ">
-                                            <label for="supplier_id" class="text-sm font-medium leading-none">Supplier</label>
+                                            <label for="supplier_id" class="admin-label">Supplier</label>
                                             <select id="supplier_id" name="supplier_id" required
-                                                class="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2">
+                                                class="admin-input">
                                                 <option value="">Select Supplier...</option>
                                                 @foreach ($Suppliers as $supplier)
                                                 <option value="{{ $supplier->id }}" {{ $order->supplier_id == $supplier->id ? 'selected' : '' }}>
@@ -98,49 +98,84 @@
                                             </select>
                                         </div>
 
-                                        <div class="space-y-2">
-                                            <label for="color" class="text-sm font-medium leading-none">Color</label>
-                                            <input type="text" name="color" id="color"
-                                                value="{{ old('color', $order->color) }}"
-                                                class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2">
+                                        <div class="space-y-2 md:col-span-2">
+                                            <label for="niche_id" class="admin-label">Niche</label>
+                                            <select id="niche_id" name="niche_id"
+                                                class="admin-input">
+                                                <option value="">Select Niche...</option>
+                                                @foreach ($niches as $niche)
+                                                <option value="{{ $niche->id }}" {{ (string) old('niche_id', $order->niche_id) === (string) $niche->id ? 'selected' : '' }}>
+                                                    {{ $niche->name }}
+                                                </option>
+                                                @endforeach
+                                            </select>
                                         </div>
 
                                         <div class="space-y-2">
-                                            <label for="size" class="text-sm font-medium leading-none">Size</label>
+                                            <label for="color" class="admin-label">Color</label>
+                                            <input type="text" name="color" id="color"
+                                                value="{{ old('color', $order->color) }}"
+                                                class="admin-input">
+                                        </div>
+
+                                        <div class="space-y-2">
+                                            <label for="size" class="admin-label">Size</label>
                                             <input type="text" name="size" id="size"
                                                 value="{{ old('size', $order->size) }}"
-                                                class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2">
+                                                class="admin-input">
                                         </div>
 
                                         <div class="flex items-center space-x-2 pt-2">
                                             <input type="checkbox" name="swap_color_size" id="swap_color_size"
-                                                class="h-4 w-4 rounded border-input bg-background text-primary focus:ring-2 focus:ring-ring focus:ring-offset-2">
+                                                class="h-4 w-4 rounded border-border bg-background text-primary focus:ring-primary/40">
                                             <label for="swap_color_size" class="text-sm text-muted-foreground">Swap Color &amp; Size</label>
                                         </div>
 
                                         <div class="space-y-2">
-                                            <label for="quantity" class="text-sm font-medium leading-none">Quantity <span class="text-red-500">*</span></label>
+                                            <label for="quantity" class="admin-label">Quantity <span class="text-red-500">*</span></label>
                                             <input type="number" name="quantity" id="quantity" required min="1"
                                                 value="{{ old('quantity', $order->quantity) }}"
-                                                class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2">
+                                                class="admin-input">
                                         </div>
 
                                         <div class="space-y-2">
-                                            <label for="price" class="text-sm font-medium leading-none">Price <span class="text-red-500">*</span></label>
+                                            <label for="price" class="admin-label">Price <span class="text-red-500">*</span></label>
                                             <input type="number" step="0.01" name="price" id="price" required min="0"
                                                 value="{{ old('price', $order->price) }}"
-                                                class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2">
+                                                class="admin-input">
+                                        </div>
+
+                                        <div class="space-y-2">
+                                            <label for="shipping_cost" class="admin-label">Shipping Cost (USD)</label>
+                                            <input type="number" step="0.01" min="0" name="shipping_cost" id="shipping_cost"
+                                                value="{{ old('shipping_cost', $order->shipping_cost) }}"
+                                                class="admin-input">
+                                        </div>
+
+                                        <div class="space-y-2">
+                                            <label for="discount_percent" class="admin-label">Discount (%)</label>
+                                            <input type="number" step="0.01" min="0" max="100" name="discount_percent" id="discount_percent"
+                                                value="{{ old('discount_percent', $order->discount_percent ?? 0) }}"
+                                                class="admin-input">
+                                        </div>
+
+                                        <div class="space-y-2 md:col-span-2">
+                                            <label for="product_cost" class="admin-label">Product Cost (USD)</label>
+                                            <input type="number" step="0.01" min="0" name="product_cost" id="product_cost"
+                                                value="{{ old('product_cost', $order->product_cost) }}"
+                                                class="admin-input">
+                                            <p class="text-xs text-muted-foreground">Calc can auto-resolve this from niche sheet when left empty.</p>
                                         </div>
 
                                         <div class="space-y-2 ">
-                                            <label for="order_date" class="text-sm font-medium leading-none">Order Date <span class="text-red-500">*</span></label>
+                                            <label for="order_date" class="admin-label">Order Date <span class="text-red-500">*</span></label>
                                             <input type="date" id="order_date" name="order_date" required
                                                 value="{{ old('order_date', $order->order_date ? $order->order_date->format('Y-m-d') : '') }}"
-                                                class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2">
+                                                class="admin-input">
                                         </div>
 
                                         <div class="space-y-2">
-                                            <label for="status" class="text-sm font-medium leading-none">Order Status <span class="text-red-500">*</span></label>
+                                            <label for="status" class="admin-label">Order Status <span class="text-red-500">*</span></label>
                                             <select id="status" name="status" required
                                                 class="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring">
                                                 <option value="pending" {{ old('status', $order->status) == 'pending' ? 'selected' : '' }}>Pending</option>
@@ -152,17 +187,17 @@
                                         </div>
 
                                         <div class="space-y-2">
-                                            <label for="main_days_allocated" class="text-sm font-medium leading-none">Opened Orders (days) <span class="text-red-500">*</span></label>
+                                            <label for="main_days_allocated" class="admin-label">Opened Orders (days) <span class="text-red-500">*</span></label>
                                             <input type="number" name="main_days_allocated" id="main_days_allocated" required
                                                 value="{{ old('main_days_allocated', $order->main_days_allocated) }}"
-                                                class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2">
+                                                class="admin-input">
                                         </div>
 
                                         <div class="space-y-2">
-                                            <label for="extra_days_allocated" class="text-sm font-medium leading-none">Extended Orders (days) <span class="text-red-500">*</span></label>
+                                            <label for="extra_days_allocated" class="admin-label">Extended Orders (days) <span class="text-red-500">*</span></label>
                                             <input type="number" name="extra_days_allocated" id="extra_days_allocated" required
                                                 value="{{ old('extra_days_allocated', $order->extra_days_allocated) }}"
-                                                class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2">
+                                                class="admin-input">
                                         </div>
 
                                         <div class="space-y-2 md:col-span-2">
@@ -207,7 +242,7 @@
                                                         PNG, JPG, GIF up to 10MB
                                                     </p>
                                                     <p class="text-xs text-blue-500 font-bold mt-2">
-                                                        💡 Tip: Click anywhere and press Ctrl+V to paste images
+                                                        ðŸ’¡ Tip: Click anywhere and press Ctrl+V to paste images
                                                     </p>
                                                 </div>
                                             </div>
@@ -227,11 +262,11 @@
 
                         <div class="mt-8 flex justify-end gap-4">
                             <a href="{{ route('admin.orders.index') }}"
-                                class="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors border border-input bg-background hover:bg-accent h-10 px-6">
+                                class="admin-btn-secondary">
                                 Cancel
                             </a>
                             <button type="submit"
-                                class="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-8">
+                                class="admin-btn-primary">
                                 Update Order
                             </button>
                         </div>

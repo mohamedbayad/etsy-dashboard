@@ -1,72 +1,76 @@
 <x-app-layout>
     <x-slot name="header">
-        <div class="flex justify-between items-center">
-            <h2 class="font-semibold text-xl text-foreground leading-tight">
-                {{ __('Create New User') }}
-            </h2>
-
-            <a href="{{ route('admin.users.create') }}"
-               class="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2">
+        <div class="admin-page-header">
+            <h1 class="admin-page-title">{{ __('User Management') }}</h1>
+            <a href="{{ route('admin.users.create') }}" class="admin-btn-primary">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="11" x2="22" y2="11"/><line x1="20.5" y1="9.5" x2="20.5" y2="12.5"/></svg>
                 Add User
             </a>
         </div>
     </x-slot>
 
-    <div class="py-12">
+    <div class="py-6">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="rounded-xl border bg-card text-card-foreground shadow">
-                <div class="p-6">
-                    <div class="relative w-full overflow-auto">
-                        <table class="w-full caption-bottom text-sm">
-                            <thead class="[&_tr]:border-b">
-                                <tr class="border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted">
-                                    <th class="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Nom</th>
-                                    <th class="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Email</th>
-                                    <th class="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Role</th>
-                                    <th class="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Spécialité</th>
-                                    <th class="h-12 px-4 text-left align-middle font-medium text-muted-foreground">Actions</th>
+            <div class="admin-panel animate-fade-up">
+                <div class="admin-panel-body">
+                    <div class="admin-table-shell">
+                        <table class="admin-table">
+                            <thead class="admin-table-head">
+                                <tr class="admin-tr">
+                                    <th class="admin-th">FullName</th>
+                                    <th class="admin-th">Email Address</th>
+                                    <th class="admin-th">Security Role</th>
+                                    <th class="admin-th">Specialty</th>
+                                    <th class="admin-th">Actions</th>
                                 </tr>
                             </thead>
-                            <tbody class="[&_tr:last-child]:border-0">
+                            <tbody class="[&_tr:last-child]:border-0 text-foreground">
                                 @foreach ($users as $user)
-                                    <tr class="border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted">
+                                    <tr class="admin-tr group">
+                                        <td class="admin-td">
+                                            <div class="flex items-center gap-3">
+                                                <div class="flex h-9 w-9 items-center justify-center rounded-full bg-primary/10 text-primary font-bold text-xs ring-1 ring-primary/20">
+                                                    {{ strtoupper(substr($user->name, 0, 2)) }}
+                                                </div>
+                                                <div class="font-bold text-foreground">{{ $user->name }}</div>
+                                            </div>
+                                        </td>
 
-                                        <td class="p-4 align-middle font-medium">{{ $user->name }}</td>
+                                        <td class="admin-td font-medium text-muted-foreground">{{ $user->email }}</td>
 
-                                        <td class="p-4 align-middle text-muted-foreground">{{ $user->email }}</td>
-
-                                        <td class="p-4 align-middle">
+                                        <td class="admin-td">
                                             @if($user->role == 'admin')
-                                                <div class="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold border-transparent bg-primary text-primary-foreground">
-                                                    Admin
-                                                </div>
+                                                <span class="admin-badge-primary">Administrator</span>
                                             @elseif ($user->role == 'super_admin')
-                                                <div class="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold border-transparent bg-secondary text-secondary-foreground">
-                                                    Super Admin
-                                                </div>
+                                                <span class="admin-badge-primary bg-indigo-600/10 text-indigo-600 border-indigo-600/20 italic">Super Admin</span>
                                             @else
-                                                <div class="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold border-transparent bg-secondary text-secondary-foreground">
-                                                    Supplier
-                                                </div>
+                                                <span class="admin-badge-secondary">Supplier Partner</span>
                                             @endif
                                         </td>
 
-                                        <td class="p-4 align-middle text-muted-foreground">
-                                            {{ $user->SupplierProfile->specialty ?? 'N/A' }}
+                                        <td class="admin-td font-bold text-xs">
+                                            @if($user->SupplierProfile && $user->SupplierProfile->specialty)
+                                                <span class="admin-badge-neutral text-[10px] bg-muted/20">
+                                                    {{ $user->SupplierProfile->specialty }}
+                                                </span>
+                                            @else
+                                                <span class="text-[10px] text-muted-foreground/50 italic font-bold uppercase tracking-wider">No Specialty</span>
+                                            @endif
                                         </td>
 
-                                        <td class="p-4 align-middle">
-                                            <div class="flex space-x-2">
-                                                <a href="{{ route('admin.users.edit', $user->id) }}" class="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors border border-input bg-background hover:bg-accent h-9 px-3">
-                                                    Edit
+                                        <td class="admin-td">
+                                            <div class="flex items-center gap-2">
+                                                <a href="{{ route('admin.users.edit', $user->id) }}"
+                                                   class="admin-btn-secondary-sm h-8 w-8 p-0" title="Edit User">
+                                                   <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/><path d="m15 5 4 4"/></svg>
                                                 </a>
 
                                                 @if (auth()->id() != $user->id)
-                                                <form action="{{ route('admin.users.destroy', $user->id) }}" method="POST" onsubmit="return confirm('Wash sure bghiti tms7?');">
+                                                <form action="{{ route('admin.users.destroy', $user->id) }}" method="POST" onsubmit="event.preventDefault(); window.confirmAdminAction(this, 'Delete User', 'Are you sure you want to permanently delete this user?', 'danger');" class="inline">
                                                     @csrf
                                                     @method('DELETE')
-                                                    <button type="submit" class="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors bg-destructive text-destructive-foreground hover:bg-destructive/90 h-9 px-3">
-                                                        Delete
+                                                    <button type="submit" class="admin-btn-danger-sm h-8 w-8 p-0" title="Delete">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/></svg>
                                                     </button>
                                                 </form>
                                                 @endif
@@ -77,7 +81,7 @@
                             </tbody>
                         </table>
                     </div>
-                    <div class="mt-4">
+                    <div class="mt-6">
                         {{ $users->links() }}
                     </div>
                 </div>

@@ -1,21 +1,18 @@
 <x-app-layout>
     <x-slot name="header">
-        <div class="flex justify-between items-center">
-            <h2 class="font-semibold text-xl text-foreground leading-tight">
-                {{ __('Bulk Status Update') }}
-            </h2>
-
-            <a href="{{ route('admin.orders.index') }}"
-                class="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors border border-input bg-background hover:bg-accent h-10 px-4 py-2">
+        <div class="admin-page-header">
+            <h1 class="admin-page-title">{{ __('Bulk Status Update') }}</h1>
+            <a href="{{ route('admin.orders.index') }}" class="admin-btn-secondary">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18" /></svg>
                 Back to Orders
             </a>
         </div>
     </x-slot>
 
-    <div class="py-12">
+    <div class="py-6">
         <div class="max-w-4xl mx-auto sm:px-6 lg:px-8">
-            <div class="rounded-xl border bg-card text-card-foreground shadow">
-                <div class="p-6 space-y-6">
+            <div class="admin-panel animate-fade-up">
+                <div class="admin-panel-body space-y-8">
                     @if (session('bulk_status_summary'))
                         @php
                             $summary = session('bulk_status_summary');
@@ -23,16 +20,23 @@
                             $missingNames = $summary['not_found_names'] ?? [];
                         @endphp
 
-                        <div class="rounded-lg border border-border bg-muted/40 p-4 space-y-2">
-                            <div class="text-sm font-medium">
-                                Updated: {{ count($updatedNames) }} names ({{ $summary['updated_orders'] ?? 0 }} orders)
+                        <div class="rounded-xl border border-primary/20 bg-primary/5 p-5 space-y-3 shadow-sm">
+                            <div class="flex items-center gap-2 text-primary font-semibold">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                                Update Summary
+                            </div>
+                            <div class="text-sm font-medium text-foreground/80 pl-7">
+                                Successfully updated <span class="text-primary font-bold">{{ count($updatedNames) }}</span> customers (<span class="text-primary font-bold">{{ $summary['updated_orders'] ?? 0 }}</span> orders)
                             </div>
                             @if (!empty($missingNames))
-                                <div class="text-sm text-destructive">
-                                    Not found: {{ count($missingNames) }} names
-                                </div>
-                                <div class="text-sm text-muted-foreground">
-                                    {{ implode(', ', $missingNames) }}
+                                <div class="mt-4 pt-4 border-t border-primary/10 pl-7">
+                                    <div class="text-sm font-semibold text-destructive mb-1 flex items-center gap-1.5">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                                        Names Not Found ({{ count($missingNames) }})
+                                    </div>
+                                    <div class="text-xs text-muted-foreground leading-relaxed">
+                                        {{ implode(', ', $missingNames) }}
+                                    </div>
                                 </div>
                             @endif
                         </div>
@@ -42,38 +46,37 @@
                         @csrf
 
                         <div class="space-y-2">
-                            <label for="customer_names" class="text-sm font-medium leading-none">Customer Names</label>
+                            <label for="customer_names" class="admin-label">Customer Names</label>
                             <textarea id="customer_names" name="customer_names" rows="6"
-                                placeholder="Paste names separated by commas"
-                                class="flex w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2">{{ old('customer_names') }}</textarea>
+                                placeholder="Paste names separated by commas (e.g. John Doe, Jane Smith)"
+                                class="admin-input h-auto min-h-[150px]">{{ old('customer_names') }}</textarea>
+                            <p class="text-[11px] text-muted-foreground italic">Tip: You can copy a list of names from Excel or a text file.</p>
                             @error('customer_names')
-                                <p class="text-sm text-destructive">{{ $message }}</p>
+                                <p class="text-xs text-destructive mt-1">{{ $message }}</p>
                             @enderror
                         </div>
 
                         <div class="space-y-2">
-                            <label for="status" class="text-sm font-medium leading-none">Status</label>
-                            <select id="status" name="status"
-                                class="flex h-10 w-full items-center justify-between rounded-md border border-input bg-transparent px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2">
-                                <option class="dark:text-black" value="pending" {{ old('status') == 'pending' ? 'selected' : '' }}>Pending</option>
-                                <option class="dark:text-black" value="main_time" {{ old('status') == 'main_time' ? 'selected' : '' }}>Opened Orders</option>
-                                <option class="dark:text-black" value="extra_time" {{ old('status') == 'extra_time' ? 'selected' : '' }}>Extended Orders</option>
-                                <option class="dark:text-black" value="not_shipped" {{ old('status') == 'not_shipped' ? 'selected' : '' }}>Not Shipped</option>
-                                <option class="dark:text-black" value="completed" {{ old('status') == 'completed' ? 'selected' : '' }}>Complete</option>
+                            <label for="status" class="admin-label">Target Status</label>
+                            <select id="status" name="status" class="admin-input">
+                                <option value="pending" {{ old('status') == 'pending' ? 'selected' : '' }}>Pending</option>
+                                <option value="main_time" {{ old('status') == 'main_time' ? 'selected' : '' }}>Opened Orders</option>
+                                <option value="extra_time" {{ old('status') == 'extra_time' ? 'selected' : '' }}>Extended Orders</option>
+                                <option value="not_shipped" {{ old('status') == 'not_shipped' ? 'selected' : '' }}>Not Shipped</option>
+                                <option value="completed" {{ old('status') == 'completed' ? 'selected' : '' }}>Complete</option>
                             </select>
                             @error('status')
-                                <p class="text-sm text-destructive">{{ $message }}</p>
+                                <p class="text-xs text-destructive mt-1">{{ $message }}</p>
                             @enderror
                         </div>
 
-                        <div class="flex items-center gap-3">
-                            <button type="submit"
-                                class="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2">
-                                Update Status
+                        <div class="flex items-center gap-3 pt-4 border-t border-border/60">
+                            <button type="submit" class="admin-btn-primary px-8">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                                Update All Statuses
                             </button>
-                            <a href="{{ route('admin.orders.bulk-status') }}"
-                                class="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors border border-input bg-background hover:bg-accent h-10 px-4 py-2">
-                                Clear
+                            <a href="{{ route('admin.orders.bulk-status') }}" class="admin-btn-secondary">
+                                Clear Form
                             </a>
                         </div>
                     </form>

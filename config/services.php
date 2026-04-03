@@ -31,4 +31,9 @@ return [
         'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
     ],
 
+    'google_sheets' => [
+        'api_key' => env('GOOGLE_SHEETS_API_KEY'),
+        'access_token' => env('GOOGLE_SHEETS_ACCESS_TOKEN'),
+    ],
+
 ];

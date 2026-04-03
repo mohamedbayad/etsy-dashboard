@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use App\Models\Order;
 use App\Models\Store;
 use App\Models\Supplier;
+use App\Models\Niche;
 
 use Illuminate\Support\Facades\DB;
 use Exception;
@@ -269,8 +270,9 @@ class OrderController extends Controller
     {
         $stores = Store::all();
         $Suppliers = Supplier::all();
+        $niches = Niche::orderBy('name')->get();
 
-        return view('admin.orders.create', compact('stores', 'Suppliers'));
+        return view('admin.orders.create', compact('stores', 'Suppliers', 'niches'));
     }
 
     /**
@@ -287,6 +289,8 @@ class OrderController extends Controller
         $request->validate([
             'store_id' => 'required|exists:stores,id',
             'supplier_id' => 'required|exists:suppliers,id',
+            'niche_id' => 'nullable|exists:niches,id',
+            'order_date' => 'required|date',
             'color' => 'nullable|string',
             'size' => 'nullable|string',
             'main_days_allocated' => 'required|integer|min:1',
@@ -299,10 +303,14 @@ class OrderController extends Controller
             'country'       => 'nullable|string|max:100',
             'quantity'      => 'required|integer|min:1',
             'price'         => 'required|numeric|min:1',
+            'shipping_cost' => 'nullable|numeric|min:0',
+            'discount_percent' => 'nullable|numeric|min:0|max:100',
+            'product_cost'  => 'nullable|numeric|min:0',
             'note'          => 'nullable|string',
         ]);
 
         $data = $request->except('_token', 'image_path', 'compress_images', 'swap_color_size');
+        $data = $this->normalizeNullableFinancialFields($data);
         $data['status'] = 'main_time';
 
         if ($request->boolean('swap_color_size')) {
@@ -360,9 +368,10 @@ class OrderController extends Controller
 
         $stores = Store::all();
         $Suppliers = Supplier::all();
+        $niches = Niche::orderBy('name')->get();
 
 
-        return view('admin.orders.edit', compact('order', 'stores', 'Suppliers'));
+        return view('admin.orders.edit', compact('order', 'stores', 'Suppliers', 'niches'));
     }
 
     /**
@@ -382,6 +391,7 @@ class OrderController extends Controller
             'store_id' => 'required|exists:stores,id',
             'order_date' => 'required|date',
             'supplier_id' => 'required|exists:suppliers,id',
+            'niche_id' => 'nullable|exists:niches,id',
             'status' => 'required|in:pending,main_time,extra_time,not_shipped,completed',
             'color' => 'nullable|string',
             'size' => 'nullable|string',
@@ -395,10 +405,14 @@ class OrderController extends Controller
             'country'       => 'nullable|string|max:100',
             'quantity'      => 'required|integer|min:1',
             'price'         => 'required|numeric|min:0',
+            'shipping_cost' => 'nullable|numeric|min:0',
+            'discount_percent' => 'nullable|numeric|min:0|max:100',
+            'product_cost'  => 'nullable|numeric|min:0',
             'note'          => 'nullable|string',
         ]);
 
         $data = $request->except('_token', '_method', 'image_path', 'compress_images', 'swap_color_size');
+        $data = $this->normalizeNullableFinancialFields($data);
         $compress = $request->boolean('compress_images');
 
         if ($request->boolean('swap_color_size')) {
@@ -518,5 +532,29 @@ class OrderController extends Controller
         if (!empty($paths)) {
             Storage::disk('public')->delete($paths);
         }
+    }
+
+    private function normalizeNullableFinancialFields(array $data): array
+    {
+        foreach (['shipping_cost', 'product_cost'] as $field) {
+            if (!array_key_exists($field, $data) || $data[$field] === '') {
+                $data[$field] = null;
+                continue;
+            }
+
+            $data[$field] = (float) $data[$field];
+        }
+
+        if (!array_key_exists('discount_percent', $data) || $data['discount_percent'] === '' || $data['discount_percent'] === null) {
+            $data['discount_percent'] = 0.0;
+        } else {
+            $data['discount_percent'] = max(0, min(100, (float) $data['discount_percent']));
+        }
+
+        if (!array_key_exists('niche_id', $data) || $data['niche_id'] === '') {
+            $data['niche_id'] = null;
+        }
+
+        return $data;
     }
 }
